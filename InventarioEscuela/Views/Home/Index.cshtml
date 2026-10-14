@@ -388,12 +388,15 @@
                                     Ver
                                 </a>
 
-                                <a asp-controller="Inventario"
-                                   asp-action="Edit"
-                                   asp-route-id="@activo.IdActivo"
-                                   class="btn-editar">
-                                    Editar
-                                </a>
+                                @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+                                {
+                                    <a asp-controller="Inventario"
+                                       asp-action="Edit"
+                                       asp-route-id="@activo.IdActivo"
+                                       class="btn-editar">
+                                        Editar
+                                    </a>
+                                }
 
                             </td>
 
@@ -555,23 +558,32 @@
 
     <div class="dashboard-actions">
 
-        <a asp-controller="Inventario"
-           asp-action="Create"
-           class="dashboard-action-register">
-            Registrar activo
-        </a>
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+        {
+            <a asp-controller="Inventario"
+               asp-action="Create"
+               class="dashboard-action-register">
+                Registrar activo
+            </a>
+        }
 
-        <a asp-controller="Movimientos"
-           asp-action="Create"
-           class="dashboard-action">
-            Registrar movimiento
-        </a>
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+        {
+            <a asp-controller="Movimientos"
+               asp-action="Create"
+               class="dashboard-action">
+                Registrar movimiento
+            </a>
+        }
 
-        <a asp-controller="Mantenimiento"
-           asp-action="Create"
-           class="dashboard-action">
-            Registrar mantenimiento
-        </a>
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+        {
+            <a asp-controller="Mantenimiento"
+               asp-action="Create"
+               class="dashboard-action">
+                Registrar mantenimiento
+            </a>
+        }
 
         <a asp-controller="Inventario"
            asp-action="Index"

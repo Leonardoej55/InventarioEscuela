@@ -1,11 +1,10 @@
-﻿    using InventarioEscuela.Models;
-
-    namespace InventarioEscuela.Services
+﻿using InventarioEscuela.Models;
+namespace InventarioEscuela.Services
+{
+    public interface IUsuarioService
     {
-        public interface IUsuarioService
-        {
-            Task<Usuario> GetUsuario(String correo, String clave);
-            Task<Usuario> SaveUsuario(Usuario usuario);
-
-        }
+        Task<Usuario?> GetUsuario(string correo, string clave);
+        Task<bool> ExisteCorreo(string correo);
+        Task<Usuario> SaveUsuario(Usuario usuario, string clave);
     }
+}

@@ -1,0 +1,27 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Acceso denegado";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acceso denegado - InventarioEscuela</title>
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="pagina-acceso-denegado">
+    <main>
+        <h1>Acceso denegado</h1>
+        <p>Tu cuenta no tiene permiso para realizar esta acción.</p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-controller="Home" asp-action="Index">Volver al inicio</a>
+        }
+        else
+        {
+            <a asp-controller="Login" asp-action="IniciarSesion">Iniciar sesión</a>
+        }
+    </main>
+</body>
+</html>

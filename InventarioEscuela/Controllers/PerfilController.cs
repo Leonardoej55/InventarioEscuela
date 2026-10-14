@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
 namespace InventarioEscuela.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Secretario,Usuario")]
     public class PerfilController : Controller
     {
         [HttpGet]
@@ -12,7 +11,6 @@ namespace InventarioEscuela.Controllers
         {
             ViewData["NombreUsuario"] =
                 User.FindFirst(ClaimTypes.Name)?.Value ?? "Usuario";
-
             return View();
         }
     }

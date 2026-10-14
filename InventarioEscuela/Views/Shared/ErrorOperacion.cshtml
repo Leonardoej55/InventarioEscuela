@@ -1,0 +1,18 @@
+﻿@model InventarioEscuela.ViewModels.ErrorOperacionViewModel
+
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<div class="registro-activo-container">
+    <h2 class="titulo-inventario">@Model.Titulo</h2>
+    <p role="alert">@Model.Mensaje</p>
+
+    <div class="registro-botones">
+        <a asp-controller="Home" asp-action="Index" class="btn-accion">Volver al inicio</a>
+        @if (!string.IsNullOrEmpty(Model.UrlReintento))
+        {
+            <a href="@Model.UrlReintento" class="btn-registrar">Volver a cargar</a>
+        }
+    </div>
+</div>

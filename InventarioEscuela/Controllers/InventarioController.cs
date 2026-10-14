@@ -1,6 +1,7 @@
 ﻿using InventarioEscuela.Data;
 using InventarioEscuela.Models;
 using InventarioEscuela.ViewModels;
+using InventarioEscuela.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,15 +9,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventarioEscuela.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Secretario,Usuario")]
     public class InventarioController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<InventarioController> _logger;
 
         public InventarioController(
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ILogger<InventarioController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -385,6 +389,7 @@ namespace InventarioEscuela.Controllers
         // CREAR
         // =========================================
         [HttpGet]
+        [Authorize(Roles = "Administrador,Secretario")]
         public async Task<IActionResult> Create()
         {
             await CargarListas();
@@ -397,225 +402,255 @@ namespace InventarioEscuela.Controllers
         // CREAR POST
         // =========================================
         [HttpPost]
+        [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            Activo activo)
+        public async Task<IActionResult> Create(Activo activo)
         {
-            // =====================================
-            // VALIDAR CÓDIGO DUPLICADO
-            // =====================================
-            bool existeCodigo =
-                await _context.Activos
-                    .AnyAsync(a =>
-                        a.NumeroIdentificacion ==
-                        activo.NumeroIdentificacion);
-
-
-            if (existeCodigo)
-            {
-                ModelState.AddModelError(
-                    nameof(activo.NumeroIdentificacion),
-                    "Ya existe un activo con este número de identificación.");
-            }
-
-
+            activo.NumeroIdentificacion = activo.NumeroIdentificacion?.Trim() ?? string.Empty;
             if (!ModelState.IsValid)
             {
                 await CargarListas(activo);
-
                 return View(activo);
             }
 
+            try
+            {
+                if (await _context.Activos.AnyAsync(a => a.NumeroIdentificacion.Trim() == activo.NumeroIdentificacion))
+                {
+                    ModelState.AddModelError(nameof(activo.NumeroIdentificacion),
+                        "Ya existe un activo con este número de identificación.");
+                }
+                await ValidarReferencias(activo.IdMarca, activo.IdEstado, activo.IdModo, activo.IdUbicacion);
 
-            activo.FechaRegistro =
-                DateTime.Now;
+                if (!ModelState.IsValid)
+                {
+                    await CargarListas(activo);
+                    return View(activo);
+                }
 
-
-            _context.Activos.Add(activo);
-
-            await _context.SaveChangesAsync();
-
-
-            return RedirectToAction(
-                nameof(Index));
+                // Guardar exclusivamente los campos del formulario, sin aceptar
+                // identificadores ni relaciones enviados como datos adicionales.
+                var nuevoActivo = new Activo
+                {
+                    NumeroIdentificacion = activo.NumeroIdentificacion,
+                    Descripcion = activo.Descripcion,
+                    Tomo = activo.Tomo,
+                    Folio = activo.Folio,
+                    Asiento = activo.Asiento,
+                    IdMarca = activo.IdMarca,
+                    Modelo = activo.Modelo,
+                    Serie = activo.Serie,
+                    IdEstado = activo.IdEstado,
+                    IdUbicacion = activo.IdUbicacion,
+                    IdModo = activo.IdModo,
+                    Observacion = activo.Observacion,
+                    FechaRegistro = DateTime.Now
+                };
+                _context.Activos.Add(nuevoActivo);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            {
+                _logger.LogError(ex, "Error de base de datos al registrar un activo.");
+                _context.ChangeTracker.Clear();
+                AgregarErrorGuardadoActivo(ex);
+                await CargarListas(activo);
+                return View(activo);
+            }
         }
-
 
         // =========================================
         // EDITAR
         // =========================================
         [HttpGet]
-        public async Task<IActionResult> Edit(
-            int id)
+        [Authorize(Roles = "Administrador,Secretario")]
+        public async Task<IActionResult> Edit(int id)
         {
-            var activo =
-                await _context.Activos
-                    .FindAsync(id);
-
-
-            if (activo == null)
+            try
             {
-                return NotFound();
+                var activo = await _context.Activos
+                    .AsNoTracking()
+                    .Include(a => a.Ubicacion)
+                    .FirstOrDefaultAsync(a => a.IdActivo == id);
+
+                if (activo == null)
+                {
+                    return NotFound();
+                }
+
+                var model = new ActivoEditViewModel
+                {
+                    IdActivo = activo.IdActivo,
+                    NumeroIdentificacion = activo.NumeroIdentificacion,
+                    Tomo = activo.Tomo,
+                    Folio = activo.Folio,
+                    Asiento = activo.Asiento,
+                    Descripcion = activo.Descripcion,
+                    IdMarca = activo.IdMarca,
+                    Modelo = activo.Modelo,
+                    Serie = activo.Serie,
+                    IdEstado = activo.IdEstado,
+                    IdModo = activo.IdModo,
+                    Observacion = activo.Observacion
+                };
+
+                await PrepararEdicion(model, activo);
+                return View(model);
             }
-
-
-            await CargarListas(activo);
-
-            return View(activo);
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            {
+                _logger.LogError(ex, "Error de base de datos al consultar un activo para edición.");
+                Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                return View("ErrorOperacion", new ErrorOperacionViewModel
+                {
+                    Titulo = "No se pudo cargar el activo",
+                    Mensaje = "No se pudo consultar la información en este momento. Intente cargarla nuevamente.",
+                    UrlReintento = Url.Action(nameof(Edit), "Inventario", new { id }) ?? string.Empty
+                });
+            }
         }
 
-
-        // =========================================
-        // EDITAR POST
-        // =========================================
         [HttpPost]
+        [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            int id,
-            Activo activo)
+        public async Task<IActionResult> Edit(int id, ActivoEditViewModel model)
         {
-            if (id != activo.IdActivo)
+            if (id != model.IdActivo)
             {
                 return NotFound();
             }
 
-
-            bool codigoDuplicado =
-                await _context.Activos
-                    .AnyAsync(a =>
-                        a.NumeroIdentificacion ==
-                        activo.NumeroIdentificacion &&
-                        a.IdActivo !=
-                        activo.IdActivo);
-
-
-            if (codigoDuplicado)
+            model.NumeroIdentificacion = model.NumeroIdentificacion?.Trim() ?? string.Empty;
+            try
             {
-                ModelState.AddModelError(
-                    nameof(activo.NumeroIdentificacion),
-                    "Ya existe otro activo con este número de identificación.");
+                var activoOriginal = await _context.Activos
+                    .Include(a => a.Ubicacion)
+                    .FirstOrDefaultAsync(a => a.IdActivo == id);
+
+                if (activoOriginal == null)
+                {
+                    return NotFound();
+                }
+
+                model.UbicacionActual = activoOriginal.Ubicacion?.UbicacionNombre ?? "Sin ubicación";
+                model.FechaRegistro = activoOriginal.FechaRegistro;
+
+                if (await _context.Activos.AnyAsync(a =>
+                    a.NumeroIdentificacion.Trim() == model.NumeroIdentificacion && a.IdActivo != id))
+                {
+                    ModelState.AddModelError(nameof(model.NumeroIdentificacion),
+                        "Ya existe otro activo con este número de identificación.");
+                }
+                await ValidarReferencias(model.IdMarca, model.IdEstado, model.IdModo);
+
+                if (!ModelState.IsValid)
+                {
+                    await PrepararEdicion(model, activoOriginal);
+                    return View(model);
+                }
+
+                activoOriginal.NumeroIdentificacion = model.NumeroIdentificacion;
+                activoOriginal.Tomo = model.Tomo;
+                activoOriginal.Folio = model.Folio;
+                activoOriginal.Asiento = model.Asiento;
+                activoOriginal.Descripcion = model.Descripcion;
+                activoOriginal.IdMarca = model.IdMarca;
+                activoOriginal.Modelo = model.Modelo;
+                activoOriginal.Serie = model.Serie;
+                activoOriginal.IdEstado = model.IdEstado;
+                activoOriginal.IdModo = model.IdModo;
+                activoOriginal.Observacion = model.Observacion;
+
+                // La ubicación y la fecha de registro nunca se cambian desde la edición.
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-
-            if (!ModelState.IsValid)
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
             {
-                await CargarListas(activo);
-
-                return View(activo);
+                _logger.LogError(ex, "Error de base de datos al editar un activo.");
+                _context.ChangeTracker.Clear();
+                AgregarErrorGuardadoActivo(ex);
+                await CargarListas(new Activo
+                {
+                    IdMarca = model.IdMarca,
+                    IdEstado = model.IdEstado,
+                    IdModo = model.IdModo
+                });
+                return View(model);
             }
-
-
-            var activoOriginal =
-                await _context.Activos
-                    .FirstOrDefaultAsync(a =>
-                        a.IdActivo == id);
-
-
-            if (activoOriginal == null)
-            {
-                return NotFound();
-            }
-
-
-            // =====================================
-            // ACTUALIZAR DATOS
-            // =====================================
-            activoOriginal.NumeroIdentificacion =
-                activo.NumeroIdentificacion;
-
-            activoOriginal.Tomo =
-                activo.Tomo;
-
-            activoOriginal.Folio =
-                activo.Folio;
-
-            activoOriginal.Asiento =
-                activo.Asiento;
-
-            activoOriginal.Descripcion =
-                activo.Descripcion;
-
-            activoOriginal.IdMarca =
-                activo.IdMarca;
-
-            activoOriginal.Modelo =
-                activo.Modelo;
-
-            activoOriginal.Serie =
-                activo.Serie;
-
-            activoOriginal.IdEstado =
-                activo.IdEstado;
-
-            activoOriginal.IdUbicacion =
-                activo.IdUbicacion;
-
-            activoOriginal.IdModo =
-                activo.IdModo;
-
-            activoOriginal.Observacion =
-                activo.Observacion;
-
-
-            // FechaRegistro se conserva
-
-
-            await _context.SaveChangesAsync();
-
-
-            return RedirectToAction(
-                nameof(Index));
         }
 
+        private void AgregarErrorGuardadoActivo(Exception error)
+        {
+            if (ErroresBaseDeDatos.EsDuplicado(error))
+            {
+                ModelState.AddModelError(nameof(Activo.NumeroIdentificacion),
+                    "Ya existe un activo con este número de identificación.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, ErroresBaseDeDatos.MensajeGuardado(error));
+            }
+        }
+
+        private async Task ValidarReferencias(int idMarca, int idEstado, int idModo, int? idUbicacion = null)
+        {
+            if (idMarca <= 0 || !await _context.Marcas.AnyAsync(m => m.IdMarca == idMarca))
+                ModelState.AddModelError(nameof(Activo.IdMarca), "La marca seleccionada no existe.");
+            if (idEstado <= 0 || !await _context.EstadosActivos.AnyAsync(e => e.IdEstado == idEstado))
+                ModelState.AddModelError(nameof(Activo.IdEstado), "El estado seleccionado no existe.");
+            if (idModo <= 0 || !await _context.ModosAdquisicion.AnyAsync(m => m.IdModoAdquisicion == idModo))
+                ModelState.AddModelError(nameof(Activo.IdModo), "El modo de adquisición seleccionado no existe.");
+            if (idUbicacion.HasValue && (idUbicacion <= 0 ||
+                !await _context.Ubicaciones.AnyAsync(u => u.IdUbicacion == idUbicacion.Value)))
+                ModelState.AddModelError(nameof(Activo.IdUbicacion), "La ubicación seleccionada no existe.");
+        }
+
+        private async Task PrepararEdicion(ActivoEditViewModel model, Activo activo)
+        {
+            model.UbicacionActual = activo.Ubicacion?.UbicacionNombre ?? "Sin ubicación";
+            model.FechaRegistro = activo.FechaRegistro;
+
+            await CargarListas(new Activo
+            {
+                IdMarca = model.IdMarca,
+                IdEstado = model.IdEstado,
+                IdModo = model.IdModo
+            });
+        }
 
         // =========================================
         // CARGAR SELECTS
         // =========================================
-        private async Task CargarListas(
-            Activo? activo = null)
+        private async Task CargarListas(Activo? activo = null)
         {
-            ViewBag.Marcas =
-                new SelectList(
-                    await _context.Marcas
-                        .OrderBy(m =>
-                            m.MarcaNombre)
-                        .ToListAsync(),
-                    "IdMarca",
-                    "MarcaNombre",
-                    activo?.IdMarca);
-
-
-            ViewBag.Estados =
-                new SelectList(
-                    await _context.EstadosActivos
-                        .OrderBy(e =>
-                            e.Estado)
-                        .ToListAsync(),
-                    "IdEstado",
-                    "Estado",
-                    activo?.IdEstado);
-
-
-            ViewBag.Ubicaciones =
-                new SelectList(
-                    await _context.Ubicaciones
-                        .OrderBy(u =>
-                            u.UbicacionNombre)
-                        .ToListAsync(),
-                    "IdUbicacion",
-                    "UbicacionNombre",
-                    activo?.IdUbicacion);
-
-
-            ViewBag.ModosAdquisicion =
-                new SelectList(
-                    await _context.ModosAdquisicion
-                        .OrderBy(m =>
-                            m.NombreModoAdquisicion)
-                        .ToListAsync(),
-                    "IdModoAdquisicion",
-                    "NombreModoAdquisicion",
-                    activo?.IdModo);
+            try
+            {
+                ViewBag.Marcas = new SelectList(await _context.Marcas.AsNoTracking()
+                    .OrderBy(m => m.MarcaNombre).ToListAsync(), "IdMarca", "MarcaNombre", activo?.IdMarca);
+                ViewBag.Estados = new SelectList(await _context.EstadosActivos.AsNoTracking()
+                    .OrderBy(e => e.Estado).ToListAsync(), "IdEstado", "Estado", activo?.IdEstado);
+                ViewBag.Ubicaciones = new SelectList(await _context.Ubicaciones.AsNoTracking()
+                    .OrderBy(u => u.UbicacionNombre).ToListAsync(), "IdUbicacion", "UbicacionNombre", activo?.IdUbicacion);
+                ViewBag.ModosAdquisicion = new SelectList(await _context.ModosAdquisicion.AsNoTracking()
+                    .OrderBy(m => m.NombreModoAdquisicion).ToListAsync(), "IdModoAdquisicion", "NombreModoAdquisicion", activo?.IdModo);
+            }
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            {
+                _logger.LogError(ex, "Error al recargar las opciones de inventario.");
+                ModelState.AddModelError(string.Empty, "No se pudieron cargar todas las opciones. Intente cargar el formulario nuevamente.");
+                ViewData["Marcas"] ??= OpcionesAnteriores(activo?.IdMarca);
+                ViewData["Estados"] ??= OpcionesAnteriores(activo?.IdEstado);
+                ViewData["Ubicaciones"] ??= OpcionesAnteriores(activo?.IdUbicacion);
+                ViewData["ModosAdquisicion"] ??= OpcionesAnteriores(activo?.IdModo);
+            }
         }
+
+        private static List<SelectListItem> OpcionesAnteriores(int? id) =>
+            id > 0 ? new List<SelectListItem>
+            {
+                new SelectListItem("Selección anterior", id.Value.ToString())
+            } : new List<SelectListItem>();
     }
 }

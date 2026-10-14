@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace InventarioEscuela.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Secretario,Usuario")]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;

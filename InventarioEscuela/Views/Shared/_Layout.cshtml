@@ -148,6 +148,16 @@
 
                 </a>
 
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a asp-controller="Login"
+                       asp-action="Registro"
+                       class="opcion-menu @(controladorActual == "Login" ? "activo" : "")">
+                        <span class="icono-menu">👥</span>
+                        <span>Registrar usuario</span>
+                    </a>
+                }
+
             </nav>
 
 
@@ -197,7 +207,6 @@
 
                     <p class="subtitulo">
 
-                        Movimiento de activos -
                         Registro y control del movimiento
                         de los activos dentro de la escuela
 
@@ -221,7 +230,7 @@
                         </span>
 
 
-                        <a asp-controller="Login"
+                        <a asp-controller="Home"
                            asp-action="CerrarSesion"
                            class="cerrar-sesion-link">
 

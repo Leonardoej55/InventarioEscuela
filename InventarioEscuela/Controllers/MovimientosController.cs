@@ -1,6 +1,7 @@
 ﻿using InventarioEscuela.Data;
 using InventarioEscuela.Models;
 using InventarioEscuela.ViewModels;
+using InventarioEscuela.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8,15 +9,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventarioEscuela.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Secretario,Usuario")]
     public class MovimientosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<MovimientosController> _logger;
 
         public MovimientosController(
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            ILogger<MovimientosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
 
@@ -317,210 +321,140 @@ namespace InventarioEscuela.Controllers
         // CREAR MOVIMIENTO
         // =========================================
         [HttpGet]
-        public async Task<IActionResult> Create()
+        [Authorize(Roles = "Administrador,Secretario")]
+        public async Task<IActionResult> Create(int? idActivo = null)
         {
-            await CargarListasMovimiento();
-
-            var model =
-                new MovimientoCreateViewModel();
-
+            var model = new MovimientoCreateViewModel { IdActivo = idActivo ?? 0 };
+            try
+            {
+                if (idActivo.HasValue && !await _context.Activos.AnyAsync(a => a.IdActivo == idActivo.Value))
+                    return NotFound();
+            }
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            {
+                _logger.LogError(ex, "Error al consultar el activo para un movimiento.");
+                ModelState.AddModelError(string.Empty, "No se pudo consultar el activo en este momento. Intente nuevamente.");
+            }
+            await CargarListasMovimiento(model.IdActivo);
             return View(model);
         }
 
-
-        // =========================================
-        // CREAR MOVIMIENTO POST
-        // =========================================
         [HttpPost]
+        [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            MovimientoCreateViewModel model)
+        public async Task<IActionResult> Create(MovimientoCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                await CargarListasMovimiento(
-                    model.IdActivo,
-                    model.UbicacionDestino);
-
+                await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
                 return View(model);
             }
-
-
-            // =====================================
-            // BUSCAR ACTIVO
-            // =====================================
-            var activo =
-                await _context.Activos
-                    .FirstOrDefaultAsync(a =>
-                        a.IdActivo ==
-                        model.IdActivo);
-
-
-            if (activo == null)
-            {
-                ModelState.AddModelError(
-                    nameof(model.IdActivo),
-                    "El activo seleccionado no existe.");
-
-                await CargarListasMovimiento(
-                    model.IdActivo,
-                    model.UbicacionDestino);
-
-                return View(model);
-            }
-
-
-            // =====================================
-            // VALIDAR UBICACIÓN DESTINO
-            // =====================================
-            bool existeDestino =
-                await _context.Ubicaciones
-                    .AnyAsync(u =>
-                        u.IdUbicacion ==
-                        model.UbicacionDestino);
-
-
-            if (!existeDestino)
-            {
-                ModelState.AddModelError(
-                    nameof(model.UbicacionDestino),
-                    "La ubicación de destino no existe.");
-
-                await CargarListasMovimiento(
-                    model.IdActivo,
-                    model.UbicacionDestino);
-
-                return View(model);
-            }
-
-
-            // =====================================
-            // EVITAR MISMA UBICACIÓN
-            // =====================================
-            if (activo.IdUbicacion ==
-                model.UbicacionDestino)
-            {
-                ModelState.AddModelError(
-                    nameof(model.UbicacionDestino),
-                    "El activo ya se encuentra en esa ubicación.");
-
-                await CargarListasMovimiento(
-                    model.IdActivo,
-                    model.UbicacionDestino);
-
-                return View(model);
-            }
-
-
-            int ubicacionAnterior =
-                activo.IdUbicacion;
-
-
-            // =====================================
-            // TRANSACCIÓN
-            // =====================================
-            await using var transaccion =
-                await _context.Database
-                    .BeginTransactionAsync();
-
 
             try
             {
-                // =================================
-                // CREAR MOVIMIENTO
-                // =================================
-                var movimiento =
-                    new MovimientoActivo
+                var activo = await _context.Activos.AsNoTracking()
+                    .FirstOrDefaultAsync(a => a.IdActivo == model.IdActivo);
+                if (activo == null)
+                {
+                    ModelState.AddModelError(nameof(model.IdActivo), "El activo seleccionado no existe.");
+                }
+                else if (activo.IdUbicacion == model.UbicacionDestino)
+                {
+                    ModelState.AddModelError(nameof(model.UbicacionDestino), "El activo ya se encuentra en esa ubicación.");
+                }
+                if (!await _context.Ubicaciones.AnyAsync(u => u.IdUbicacion == model.UbicacionDestino))
+                    ModelState.AddModelError(nameof(model.UbicacionDestino), "La ubicación de destino no existe.");
+
+                if (!ModelState.IsValid)
+                {
+                    await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                    return View(model);
+                }
+
+                int ubicacionAnterior = activo!.IdUbicacion;
+                int filasActualizadas;
+                await using (var transaccion = await _context.Database.BeginTransactionAsync())
+                {
+                    try
                     {
-                        IdActivo =
-                            activo.IdActivo,
+                        filasActualizadas = await _context.Activos
+                            .Where(a => a.IdActivo == model.IdActivo && a.IdUbicacion == ubicacionAnterior)
+                            .ExecuteUpdateAsync(setters => setters.SetProperty(a => a.IdUbicacion, model.UbicacionDestino));
 
-                        UbicacionOrigen =
-                            ubicacionAnterior,
+                        if (filasActualizadas == 1)
+                        {
+                            _context.MovimientosActivos.Add(new MovimientoActivo
+                            {
+                                IdActivo = activo.IdActivo,
+                                UbicacionOrigen = ubicacionAnterior,
+                                UbicacionDestino = model.UbicacionDestino,
+                                FechaMovimiento = DateTime.Now,
+                                Responsable = string.IsNullOrWhiteSpace(model.Responsable)
+                                    ? User.Identity?.Name ?? "Usuario" : model.Responsable.Trim(),
+                                Observacion = model.Observacion?.Trim() ?? string.Empty
+                            });
+                            await _context.SaveChangesAsync();
+                            await transaccion.CommitAsync();
+                        }
+                        else
+                        {
+                            await transaccion.RollbackAsync();
+                        }
+                    }
+                    catch
+                    {
+                        // Conservar el error original aunque falle la limpieza de la transacción.
+                        try { await transaccion.RollbackAsync(); }
+                        catch (Exception rollbackError)
+                        {
+                            _logger.LogError(rollbackError, "Error al revertir una transacción de movimiento.");
+                        }
+                        throw;
+                    }
+                }
 
-                        UbicacionDestino =
-                            model.UbicacionDestino,
-
-                        FechaMovimiento =
-                            DateTime.Now,
-
-                        Responsable =
-                            model.Responsable,
-
-                        Observacion =
-                            model.Observacion
-                    };
-
-
-                _context.MovimientosActivos
-                    .Add(movimiento);
-
-
-                // =================================
-                // ACTUALIZAR UBICACIÓN DEL ACTIVO
-                // =================================
-                activo.IdUbicacion =
-                    model.UbicacionDestino;
-
-
-                await _context
-                    .SaveChangesAsync();
-
-
-                await transaccion
-                    .CommitAsync();
+                if (filasActualizadas != 1)
+                {
+                    ModelState.AddModelError(string.Empty,
+                        "La ubicación cambió mientras se procesaba el traslado, o el activo fue eliminado. " +
+                        "Consulte el inventario y revise el movimiento antes de intentarlo nuevamente.");
+                    await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                    return View(model);
+                }
+                return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
             {
-                await transaccion
-                    .RollbackAsync();
-
-                throw;
+                _logger.LogError(ex, "Error de base de datos al registrar un movimiento.");
+                _context.ChangeTracker.Clear();
+                ModelState.AddModelError(string.Empty, ErroresBaseDeDatos.MensajeGuardado(ex));
+                await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                return View(model);
             }
-
-
-            return RedirectToAction(
-                nameof(Index));
         }
 
-
-        // =========================================
-        // CARGAR SELECTS DE MOVIMIENTO
-        // =========================================
-        private async Task CargarListasMovimiento(
-            int? idActivo = null,
-            int? idUbicacionDestino = null)
+        private async Task CargarListasMovimiento(int? idActivo = null, int? idUbicacionDestino = null)
         {
-            var activos =
-                await _context.Activos
-                    .AsNoTracking()
-                    .OrderBy(a =>
-                        a.NumeroIdentificacion)
-                    .ToListAsync();
-
-
-            ViewBag.Activos =
-                new SelectList(
-                    activos,
-                    "IdActivo",
-                    "NumeroIdentificacion",
-                    idActivo);
-
-
-            var ubicaciones =
-                await _context.Ubicaciones
-                    .AsNoTracking()
-                    .OrderBy(u =>
-                        u.UbicacionNombre)
-                    .ToListAsync();
-
-
-            ViewBag.Ubicaciones =
-                new SelectList(
-                    ubicaciones,
-                    "IdUbicacion",
-                    "UbicacionNombre",
-                    idUbicacionDestino);
+            try
+            {
+                ViewBag.Activos = new SelectList(await _context.Activos.AsNoTracking()
+                    .OrderBy(a => a.NumeroIdentificacion).ToListAsync(), "IdActivo", "NumeroIdentificacion", idActivo);
+                ViewBag.Ubicaciones = new SelectList(await _context.Ubicaciones.AsNoTracking()
+                    .OrderBy(u => u.UbicacionNombre).ToListAsync(), "IdUbicacion", "UbicacionNombre", idUbicacionDestino);
+            }
+            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            {
+                _logger.LogError(ex, "Error al recargar las opciones de movimientos.");
+                ModelState.AddModelError(string.Empty, "No se pudieron cargar todas las opciones. Intente cargar el formulario nuevamente.");
+                ViewData["Activos"] ??= OpcionesAnteriores(idActivo);
+                ViewData["Ubicaciones"] ??= OpcionesAnteriores(idUbicacionDestino);
+            }
         }
+
+        private static List<SelectListItem> OpcionesAnteriores(int? id) =>
+            id > 0 ? new List<SelectListItem>
+            {
+                new SelectListItem("Selección anterior", id.Value.ToString())
+            } : new List<SelectListItem>();
     }
 }

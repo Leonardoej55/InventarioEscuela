@@ -1,12 +1,12 @@
 using InventarioEscuela.Data;
+using InventarioEscuela.Models;
 using InventarioEscuela.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
-
 var builder = WebApplication.CreateBuilder(args);
-
 // =========================================
 // MVC + desactivar caché en las respuestas
 // =========================================
@@ -19,7 +19,6 @@ builder.Services.AddControllersWithViews(opciones =>
             Location = ResponseCacheLocation.None
         });
 });
-
 // =========================================
 // BASE DE DATOS
 // =========================================
@@ -29,12 +28,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("CadenaSQL")
     );
 });
-
 // =========================================
 // SERVICIOS
 // =========================================
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-
+builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 // =========================================
 // AUTENTICACIÓN POR COOKIES
 // =========================================
@@ -43,15 +41,12 @@ builder.Services
     .AddCookie(opciones =>
     {
         opciones.LoginPath = "/Login/IniciarSesion";
-
+        opciones.AccessDeniedPath = "/Login/AccesoDenegado";
         opciones.ExpireTimeSpan = TimeSpan.FromMinutes(20);
-
         opciones.SlidingExpiration = true;
     });
-
 var app = builder.Build();
 QuestPDF.Settings.License = LicenseType.Community;
-
 // =========================================
 // MANEJO DE ERRORES
 // =========================================
@@ -60,19 +55,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 // =========================================
 // PIPELINE HTTP
 // =========================================
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapStaticAssets();
-
 // =========================================
 // RUTA PRINCIPAL
 // =========================================
@@ -80,5 +70,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=IniciarSesion}/{id?}")
     .WithStaticAssets();
-
 app.Run();

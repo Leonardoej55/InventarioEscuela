@@ -1,355 +1,136 @@
-@model InventarioEscuela.Models.Activo
+@model InventarioEscuela.ViewModels.ActivoEditViewModel
 
 @{
     ViewData["Title"] = "Editar activo";
 }
 
 <div class="registro-activo-container">
-
     <h2 class="titulo-inventario">Editar activo</h2>
 
-    <form asp-controller="Inventario"
-          asp-action="Edit"
-          asp-route-id="@Model.IdActivo"
-          method="post">
+    <form asp-controller="Inventario" asp-action="Edit"
+          asp-route-id="@Model.IdActivo" method="post">
+        <input type="hidden" asp-for="IdActivo" />
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-        @Html.AntiForgeryToken()
-
-        <input type="hidden"
-               asp-for="IdActivo" />
-
-        <div asp-validation-summary="ModelOnly"
-             class="text-danger">
-        </div>
-
-        <!-- =========================================
-             INFORMACIÓN GENERAL
-             ========================================= -->
         <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información general
-            </h3>
-
+            <h3 class="registro-seccion-titulo">Información general</h3>
             <div class="registro-grid">
-
                 <div class="registro-campo">
-
-                    <label asp-for="NumeroIdentificacion">
-                        Número de identificación
-                    </label>
-
-                    <input asp-for="NumeroIdentificacion"
-                           class="registro-input"
-                           placeholder="Ej: EPC-2026-0001" />
-
-                    <span asp-validation-for="NumeroIdentificacion"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="NumeroIdentificacion">Número de identificación</label>
+                    <input asp-for="NumeroIdentificacion" class="registro-input"
+                           placeholder="Ej: EPC-2026-0001" maxlength="50" required />
+                    <span asp-validation-for="NumeroIdentificacion" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="Descripcion">
-                        Descripción
-                    </label>
-
-                    <input asp-for="Descripcion"
-                           class="registro-input"
-                           placeholder="Descripción del activo" />
-
-                    <span asp-validation-for="Descripcion"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="Descripcion">Descripción</label>
+                    <input asp-for="Descripcion" class="registro-input"
+                           placeholder="Descripción del activo" maxlength="250" required />
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="IdMarca">
-                        Marca
-                    </label>
-
-                    <select asp-for="IdMarca"
-                            class="registro-input"
-                            asp-items="@(new SelectList(
-                                                        ViewBag.Marcas,
-                                                        "IdMarca",
-                                                        "MarcaNombre",
-                                                        Model.IdMarca
-                                                    ))">
-
-                        <option value="">
-                            Seleccione una marca
-                        </option>
-
+                    <label asp-for="IdMarca">Marca</label>
+                    <select asp-for="IdMarca" asp-items="ViewBag.Marcas" class="registro-input" required>
+                        <option value="">Seleccione una marca</option>
                     </select>
-
-                    <span asp-validation-for="IdMarca"
-                          class="text-danger">
-                    </span>
-
+                    <span asp-validation-for="IdMarca" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="Serie">
-                        Serie
-                    </label>
-
-                    <input asp-for="Serie"
-                           class="registro-input"
-                           placeholder="Número de serie" />
-
-                    <span asp-validation-for="Serie"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="Modelo">Modelo</label>
+                    <input asp-for="Modelo" class="registro-input"
+                           placeholder="Modelo del activo" maxlength="100" />
+                    <span asp-validation-for="Modelo" class="text-danger"></span>
                 </div>
-
+                <div class="registro-campo">
+                    <label asp-for="Serie">Serie</label>
+                    <input asp-for="Serie" class="registro-input"
+                           placeholder="Número de serie" maxlength="100" />
+                    <span asp-validation-for="Serie" class="text-danger"></span>
+                </div>
             </div>
-
         </div>
 
-
-        <!-- =========================================
-             INFORMACIÓN REGISTRAL
-             ========================================= -->
         <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información registral
-            </h3>
-
+            <h3 class="registro-seccion-titulo">Información registral</h3>
             <div class="registro-grid">
-
                 <div class="registro-campo">
-
-                    <label asp-for="Tomo">
-                        Tomo
-                    </label>
-
-                    <input asp-for="Tomo"
-                           class="registro-input"
-                           placeholder="Tomo" />
-
-                    <span asp-validation-for="Tomo"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="Tomo">Tomo</label>
+                    <input asp-for="Tomo" class="registro-input" placeholder="Tomo" maxlength="20" />
+                    <span asp-validation-for="Tomo" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="Folio">
-                        Folio
-                    </label>
-
-                    <input asp-for="Folio"
-                           class="registro-input"
-                           placeholder="Folio" />
-
-                    <span asp-validation-for="Folio"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="Folio">Folio</label>
+                    <input asp-for="Folio" class="registro-input" placeholder="Folio" maxlength="20" />
+                    <span asp-validation-for="Folio" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="Asiento">
-                        Asiento
-                    </label>
-
-                    <input asp-for="Asiento"
-                           class="registro-input"
-                           placeholder="Asiento" />
-
-                    <span asp-validation-for="Asiento"
-                          class="text-danger">
-                    </span>
-
+                    <label asp-for="Asiento">Asiento</label>
+                    <input asp-for="Asiento" class="registro-input" placeholder="Asiento" maxlength="20" />
+                    <span asp-validation-for="Asiento" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label>
-                        Fecha de registro
-                    </label>
-
-                    <input class="registro-input"
-                           value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")"
-                           readonly />
-
+                    <label for="fecha-registro">Fecha de registro</label>
+                    <input id="fecha-registro" class="registro-input"
+                           value="@(Model.FechaRegistro == default ? string.Empty : Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm"))"
+                           placeholder="No disponible" readonly />
                 </div>
-
             </div>
-
         </div>
 
-
-        <!-- =========================================
-             CLASIFICACIÓN Y UBICACIÓN
-             ========================================= -->
         <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Clasificación y ubicación
-            </h3>
-
+            <h3 class="registro-seccion-titulo">Clasificación y ubicación</h3>
             <div class="registro-grid">
-
                 <div class="registro-campo">
-
-                    <label asp-for="IdEstado">
-                        Estado
-                    </label>
-
-                    <select asp-for="IdEstado"
-                            class="registro-input"
-                            asp-items="@(new SelectList(
-                                                        ViewBag.Estados,
-                                                        "IdEstado",
-                                                        "Estado",
-                                                        Model.IdEstado
-                                                    ))">
-
-                        <option value="">
-                            Seleccione un estado
-                        </option>
-
+                    <label asp-for="IdEstado">Estado</label>
+                    <select asp-for="IdEstado" asp-items="ViewBag.Estados" class="registro-input" required>
+                        <option value="">Seleccione un estado</option>
                     </select>
-
-                    <span asp-validation-for="IdEstado"
-                          class="text-danger">
-                    </span>
-
+                    <span asp-validation-for="IdEstado" class="text-danger"></span>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="IdUbicacion">
-                        Ubicación
-                    </label>
-
-                    <select asp-for="IdUbicacion"
-                            class="registro-input"
-                            asp-items="@(new SelectList(
-                                                        ViewBag.Ubicaciones,
-                                                        "IdUbicacion",
-                                                        "UbicacionNombre",
-                                                        Model.IdUbicacion
-                                                    ))">
-
-                        <option value="">
-                            Seleccione una ubicación
-                        </option>
-
-                    </select>
-
-                    <span asp-validation-for="IdUbicacion"
-                          class="text-danger">
-                    </span>
-
+                    <label for="ubicacion-actual">Ubicación actual</label>
+                    <input id="ubicacion-actual" class="registro-input"
+                           value="@Model.UbicacionActual" placeholder="No disponible" aria-describedby="ayuda-ubicacion" readonly />
+                    <p id="ayuda-ubicacion" class="registro-ayuda">
+                        Para cambiar la ubicación, registre un movimiento.
+                        Así se conserva el historial del activo.
+                        Guarde los demás cambios antes de abrir el movimiento.
+                    </p>
+                    <div class="registro-ubicacion-acciones">
+                        <a asp-controller="Movimientos" asp-action="Create"
+                           asp-route-idActivo="@Model.IdActivo" class="btn-accion">
+                            Registrar movimiento
+                        </a>
+                    </div>
                 </div>
-
-
                 <div class="registro-campo">
-
-                    <label asp-for="IdModo">
-                        Modo de adquisición
-                    </label>
-
-                    <select asp-for="IdModo"
-                            class="registro-input"
-                            asp-items="@(new SelectList(
-                                                        ViewBag.ModosAdquisicion,
-                                                        "IdModoAdquisicion",
-                                                        "NombreModoAdquisicion",
-                                                        Model.IdModo
-                                                    ))">
-
-                        <option value="">
-                            Seleccione un modo de adquisición
-                        </option>
-
+                    <label asp-for="IdModo">Modo de adquisición</label>
+                    <select asp-for="IdModo" asp-items="ViewBag.ModosAdquisicion" class="registro-input" required>
+                        <option value="">Seleccione un modo de adquisición</option>
                     </select>
-
-                    <span asp-validation-for="IdModo"
-                          class="text-danger">
-                    </span>
-
+                    <span asp-validation-for="IdModo" class="text-danger"></span>
                 </div>
-
             </div>
-
         </div>
 
-
-        <!-- =========================================
-             OBSERVACIONES
-             ========================================= -->
         <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Observaciones
-            </h3>
-
-            <div class="registro-grid">
-
-                <div class="registro-campo registro-campo-completo">
-
-                    <label asp-for="Observacion">
-                        Observación
-                    </label>
-
-                    <textarea asp-for="Observacion"
-                              class="registro-textarea"
-                              placeholder="Ingrese alguna observación adicional"></textarea>
-
-                    <span asp-validation-for="Observacion"
-                          class="text-danger">
-                    </span>
-
-                </div>
-
+            <h3 class="registro-seccion-titulo">Observaciones</h3>
+            <div class="registro-campo">
+                <label asp-for="Observacion">Observación</label>
+                <textarea asp-for="Observacion" class="registro-textarea" rows="4"
+                          maxlength="500" placeholder="Ingrese alguna observación adicional"></textarea>
+                <span asp-validation-for="Observacion" class="text-danger"></span>
             </div>
-
         </div>
 
-
-        <!-- =========================================
-             BOTONES
-             ========================================= -->
         <div class="registro-botones">
-
-            <a asp-controller="Inventario"
-               asp-action="Index"
-               class="btn-accion">
-                Cancelar
-            </a>
-
-            <button type="submit"
-                    class="btn-registrar">
-                Guardar cambios
-            </button>
-
+            <a asp-controller="Inventario" asp-action="Index" class="btn-accion">Cancelar</a>
+            <button type="submit" class="btn-registrar">Guardar cambios</button>
         </div>
-
     </form>
-
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@section Scripts
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -693,13 +693,16 @@
 
     <div class="dashboard-actions">
 
-        <a asp-controller="Movimientos"
-           asp-action="Create"
-           class="dashboard-action-register">
-
-            Registrar movimiento
-
-        </a>
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+        {
+            <a asp-controller="Movimientos"
+               asp-action="Create"
+               class="dashboard-action-register">
+    
+                Registrar movimiento
+    
+            </a>
+        }
 
     </div>
 

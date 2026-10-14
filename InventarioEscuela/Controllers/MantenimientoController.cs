@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InventarioEscuela.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Secretario,Usuario")]
     public class MantenimientoController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -349,6 +349,7 @@ namespace InventarioEscuela.Controllers
         // CREATE GET
         // =========================================
         [HttpGet]
+        [Authorize(Roles = "Administrador,Secretario")]
         public async Task<IActionResult> Create()
         {
             await CargarListasMantenimiento();
@@ -370,6 +371,7 @@ namespace InventarioEscuela.Controllers
         // CREATE POST
         // =========================================
         [HttpPost]
+        [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             MantenimientoCreateViewModel model)
