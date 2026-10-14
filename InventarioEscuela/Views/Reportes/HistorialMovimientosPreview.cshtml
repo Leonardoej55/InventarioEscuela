@@ -1,0 +1,523 @@
+﻿@model InventarioEscuela.ViewModels.ReporteHistorialMovimientosViewModel
+
+@{
+    ViewData["Title"] = "Vista previa - Historial de movimientos";
+
+    int paginasVisibles = 5;
+
+    int paginaInicio =
+        Math.Max(
+            1,
+            Model.PaginaActual - 2);
+
+    int paginaFin =
+        Math.Min(
+            Model.TotalPaginas,
+            paginaInicio + paginasVisibles - 1);
+
+    if (paginaFin - paginaInicio + 1 < paginasVisibles)
+    {
+        paginaInicio =
+            Math.Max(
+                1,
+                paginaFin - paginasVisibles + 1);
+    }
+}
+
+
+<div class="dashboard-page">
+
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="dashboard-section-title">
+        Vista previa - Historial de movimientos
+    </h2>
+
+
+    <div style="
+        margin-bottom:15px;
+        font-size:11px;
+        color:#666;">
+
+        Revise la información antes de generar
+        el documento PDF.
+
+    </div>
+
+
+    <!-- =========================================
+         RESUMEN
+         ========================================= -->
+    <div class="dashboard-resumen">
+
+
+        <!-- MOVIMIENTOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                🔄
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalMovimientos
+                </div>
+
+                <div class="dashboard-card-title">
+                    Movimientos
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                📦
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalActivosMovidos
+                </div>
+
+                <div class="dashboard-card-title">
+                    Activos movilizados
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ORÍGENES -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                📤
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalUbicacionesOrigen
+                </div>
+
+                <div class="dashboard-card-title">
+                    Ubicaciones origen
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DESTINOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                📍
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalUbicacionesDestino
+                </div>
+
+                <div class="dashboard-card-title">
+                    Ubicaciones destino
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         CANTIDAD MOSTRADA
+         ========================================= -->
+    <div style="
+        margin-top:10px;
+        margin-bottom:8px;
+        font-size:11px;
+        color:#666;">
+
+        Mostrando
+
+        <strong>
+            @(
+                Model.TotalMovimientos == 0
+                ? 0
+                : ((Model.PaginaActual - 1)
+                    * Model.TamanoPagina) + 1
+            )
+        </strong>
+
+        -
+
+        <strong>
+            @Math.Min(
+                Model.PaginaActual *
+                Model.TamanoPagina,
+                Model.TotalMovimientos)
+        </strong>
+
+        de
+
+        <strong>
+            @Model.TotalMovimientos
+        </strong>
+
+        movimientos.
+
+    </div>
+
+
+    <!-- =========================================
+         TABLA
+         ========================================= -->
+    <div class="dashboard-table-container">
+
+        <table class="tabla-base dashboard-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Fecha
+                    </th>
+
+                    <th>
+                        Código
+                    </th>
+
+                    <th>
+                        Descripción
+                    </th>
+
+                    <th>
+                        Origen
+                    </th>
+
+                    <th>
+                        Destino
+                    </th>
+
+                    <th>
+                        Responsable
+                    </th>
+
+                    <th>
+                        Observación
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @if (Model.Movimientos.Any())
+                {
+                    foreach (var movimiento
+                        in Model.Movimientos)
+                    {
+                        <tr>
+
+                            <!-- FECHA -->
+                            <td>
+                                @(movimiento.FechaMovimiento
+                                    .ToString("dd/MM/yyyy HH:mm"))
+                            </td>
+
+
+                            <!-- CÓDIGO -->
+                            <td>
+                                @(movimiento.Activo?
+                                    .NumeroIdentificacion
+                                    ?? "N/I")
+                            </td>
+
+
+                            <!-- DESCRIPCIÓN -->
+                            <td>
+                                @(movimiento.Activo?
+                                    .Descripcion
+                                    ?? "N/I")
+                            </td>
+
+
+                            <!-- ORIGEN -->
+                            <td>
+                                @(movimiento.MovimientosOrigen?
+                                    .UbicacionNombre
+                                    ?? "Sin origen")
+                            </td>
+
+
+                            <!-- DESTINO -->
+                            <td>
+                                @(movimiento.MovimientosDestino?
+                                    .UbicacionNombre
+                                    ?? "N/I")
+                            </td>
+
+
+                            <!-- RESPONSABLE -->
+                            <td>
+                                @(string.IsNullOrWhiteSpace(
+                                    movimiento.Responsable)
+                                    ? "N/I"
+                                    : movimiento.Responsable)
+                            </td>
+
+
+                            <!-- OBSERVACIÓN -->
+                            <td>
+                                @(string.IsNullOrWhiteSpace(
+                                    movimiento.Observacion)
+                                    ? "Sin observación"
+                                    : movimiento.Observacion)
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="7"
+                            style="
+                            text-align:center;
+                            padding:14px;">
+
+                            No se encontraron movimientos
+                            para los filtros seleccionados.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PAGINACIÓN
+         ========================================= -->
+    @if (Model.TotalPaginas > 1)
+    {
+        <div class="dashboard-pagination">
+
+
+            <!-- =====================================
+                 PRIMERA / ANTERIOR
+                 ===================================== -->
+            @if (Model.PaginaActual > 1)
+            {
+                <a asp-controller="Reportes"
+                   asp-action="HistorialMovimientosPreview"
+                   asp-route-pagina="1"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+                   asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-observacionFiltro="@Model.ObservacionFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Primera página">
+
+                    «
+
+                </a>
+
+
+                <a asp-controller="Reportes"
+                   asp-action="HistorialMovimientosPreview"
+                   asp-route-pagina="@(Model.PaginaActual - 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+                   asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-observacionFiltro="@Model.ObservacionFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Página anterior">
+
+                    ‹
+
+                </a>
+            }
+
+
+            <!-- =====================================
+                 NÚMEROS
+                 ===================================== -->
+            @for (int i = paginaInicio;
+                  i <= paginaFin;
+                  i++)
+            {
+                if (i == Model.PaginaActual)
+                {
+                    <span class="dashboard-page-number active">
+
+                        @i
+
+                    </span>
+                }
+                else
+                {
+                    <a asp-controller="Reportes"
+                       asp-action="HistorialMovimientosPreview"
+                       asp-route-pagina="@i"
+                       asp-route-codigoFiltro="@Model.CodigoFiltro"
+                       asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                       asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+                       asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+                       asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                       asp-route-observacionFiltro="@Model.ObservacionFiltro"
+                       asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                       asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                       class="dashboard-page-number">
+
+                        @i
+
+                    </a>
+                }
+            }
+
+
+            <!-- =====================================
+                 SIGUIENTE / ÚLTIMA
+                 ===================================== -->
+            @if (Model.PaginaActual <
+                Model.TotalPaginas)
+            {
+                <a asp-controller="Reportes"
+                   asp-action="HistorialMovimientosPreview"
+                   asp-route-pagina="@(Model.PaginaActual + 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+                   asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-observacionFiltro="@Model.ObservacionFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Página siguiente">
+
+                    ›
+
+                </a>
+
+
+                <a asp-controller="Reportes"
+                   asp-action="HistorialMovimientosPreview"
+                   asp-route-pagina="@Model.TotalPaginas"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+                   asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-observacionFiltro="@Model.ObservacionFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Última página">
+
+                    »
+
+                </a>
+            }
+
+        </div>
+
+
+        <div style="
+            text-align:right;
+            margin-top:5px;
+            font-size:10px;
+            color:#777;">
+
+            Página
+
+            <strong>
+                @Model.PaginaActual
+            </strong>
+
+            de
+
+            <strong>
+                @Model.TotalPaginas
+            </strong>
+
+        </div>
+    }
+
+
+    <!-- =========================================
+         BOTONES
+         ========================================= -->
+    <div class="registro-botones">
+
+        <a asp-controller="Reportes"
+           asp-action="HistorialMovimientos"
+           asp-route-codigoFiltro="@Model.CodigoFiltro"
+           asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+           asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+           asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+           asp-route-responsableFiltro="@Model.ResponsableFiltro"
+           asp-route-observacionFiltro="@Model.ObservacionFiltro"
+           asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+           asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+           class="btn-accion">
+
+            Modificar filtros
+
+        </a>
+
+
+        @if (Model.TotalMovimientos > 0)
+        {
+            <a asp-controller="Reportes"
+               asp-action="GenerarHistorialMovimientosPdf"
+               asp-route-codigoFiltro="@Model.CodigoFiltro"
+               asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+               asp-route-idUbicacionOrigenFiltro="@Model.IdUbicacionOrigenFiltro"
+               asp-route-idUbicacionDestinoFiltro="@Model.IdUbicacionDestinoFiltro"
+               asp-route-responsableFiltro="@Model.ResponsableFiltro"
+               asp-route-observacionFiltro="@Model.ObservacionFiltro"
+               asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+               asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+               class="btn-registrar">
+
+                Generar PDF
+
+            </a>
+        }
+
+    </div>
+
+</div>

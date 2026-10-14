@@ -1,0 +1,368 @@
+@model InventarioEscuela.Models.Activo
+
+@{
+    ViewData["Title"] = "Registrar activo";
+}
+
+<div class="registro-activo-container">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="titulo-inventario">
+        Registrar nuevo activo
+    </h2>
+
+
+    <!-- =========================================
+         FORMULARIO
+         ========================================= -->
+    <form asp-controller="Inventario"
+          asp-action="Create"
+          method="post">
+
+
+        <!-- =====================================
+             ERRORES GENERALES
+             ===================================== -->
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger">
+        </div>
+
+
+        <!-- =========================================
+             INFORMACIÓN GENERAL
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información general
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- NÚMERO IDENTIFICACIÓN -->
+                <div class="registro-campo">
+
+                    <label asp-for="NumeroIdentificacion">
+                        Número de identificación
+                    </label>
+
+                    <input asp-for="NumeroIdentificacion"
+                           class="registro-input"
+                           placeholder="Ej: 5032-0001" />
+
+                    <span asp-validation-for="NumeroIdentificacion"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+                <div class="registro-campo">
+
+                    <label asp-for="Descripcion">
+                        Descripción
+                    </label>
+
+                    <input asp-for="Descripcion"
+                           class="registro-input"
+                           placeholder="Descripción del activo" />
+
+                    <span asp-validation-for="Descripcion"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- MARCA -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdMarca">
+                        Marca
+                    </label>
+
+                    <select asp-for="IdMarca"
+                            asp-items="ViewBag.Marcas"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione una marca
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdMarca"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- MODELO -->
+                <div class="registro-campo">
+
+                    <label asp-for="Modelo">
+                        Modelo
+                    </label>
+
+                    <input asp-for="Modelo"
+                           class="registro-input"
+                           placeholder="Modelo del activo" />
+
+                    <span asp-validation-for="Modelo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- SERIE -->
+                <div class="registro-campo">
+
+                    <label asp-for="Serie">
+                        Serie
+                    </label>
+
+                    <input asp-for="Serie"
+                           class="registro-input"
+                           placeholder="Número de serie" />
+
+                    <span asp-validation-for="Serie"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             INFORMACIÓN REGISTRAL
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información registral
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- TOMO -->
+                <div class="registro-campo">
+
+                    <label asp-for="Tomo">
+                        Tomo
+                    </label>
+
+                    <input asp-for="Tomo"
+                           class="registro-input"
+                           placeholder="Tomo" />
+
+                    <span asp-validation-for="Tomo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- FOLIO -->
+                <div class="registro-campo">
+
+                    <label asp-for="Folio">
+                        Folio
+                    </label>
+
+                    <input asp-for="Folio"
+                           class="registro-input"
+                           placeholder="Folio" />
+
+                    <span asp-validation-for="Folio"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- ASIENTO -->
+                <div class="registro-campo">
+
+                    <label asp-for="Asiento">
+                        Asiento
+                    </label>
+
+                    <input asp-for="Asiento"
+                           class="registro-input"
+                           placeholder="Asiento" />
+
+                    <span asp-validation-for="Asiento"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             CLASIFICACIÓN Y UBICACIÓN
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Clasificación y ubicación
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- ESTADO -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdEstado">
+                        Estado
+                    </label>
+
+                    <select asp-for="IdEstado"
+                            asp-items="ViewBag.Estados"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione un estado
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdEstado"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- UBICACIÓN -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdUbicacion">
+                        Ubicación
+                    </label>
+
+                    <select asp-for="IdUbicacion"
+                            asp-items="ViewBag.Ubicaciones"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione una ubicación
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdUbicacion"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- MODO DE ADQUISICIÓN -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdModo">
+                        Modo de adquisición
+                    </label>
+
+                    <select asp-for="IdModo"
+                            asp-items="ViewBag.ModosAdquisicion"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione un modo de adquisición
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdModo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             OBSERVACIÓN
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Observaciones
+            </h3>
+
+
+            <div class="registro-campo">
+
+                <label asp-for="Observacion">
+                    Observación
+                </label>
+
+                <textarea asp-for="Observacion"
+                          class="registro-textarea"
+                          rows="4"
+                          placeholder="Ingrese una observación si es necesario">
+                </textarea>
+
+                <span asp-validation-for="Observacion"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             BOTONES
+             ========================================= -->
+        <div class="registro-botones">
+
+            <a asp-controller="Inventario"
+               asp-action="Index"
+               class="btn-accion">
+
+                Cancelar
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                Registrar activo
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

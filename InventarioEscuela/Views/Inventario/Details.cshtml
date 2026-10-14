@@ -1,0 +1,185 @@
+﻿@model InventarioEscuela.Models.Activo
+
+@{
+    ViewData["Title"] = "Ver activo";
+}
+
+<div class="registro-activo-container">
+
+    <h2 class="titulo-inventario">Detalle del activo</h2>
+
+    <!-- =========================================
+         INFORMACIÓN GENERAL
+         ========================================= -->
+    <div class="registro-seccion">
+
+        <h3 class="registro-seccion-titulo">
+            Información general
+        </h3>
+
+        <div class="registro-grid">
+
+            <div class="registro-campo">
+                <label>Número de identificación</label>
+
+                <input class="registro-input"
+                       value="@Model.NumeroIdentificacion"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Descripción</label>
+
+                <input class="registro-input"
+                       value="@Model.Descripcion"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Marca</label>
+
+                <input class="registro-input"
+                       value="@(Model.Marca?.MarcaNombre ?? "Sin marca")"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Serie</label>
+
+                <input class="registro-input"
+                       value="@(string.IsNullOrWhiteSpace(Model.Serie) ? "Sin serie" : Model.Serie)"
+                       readonly />
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         INFORMACIÓN REGISTRAL
+         ========================================= -->
+    <div class="registro-seccion">
+
+        <h3 class="registro-seccion-titulo">
+            Información registral
+        </h3>
+
+        <div class="registro-grid">
+
+            <div class="registro-campo">
+                <label>Tomo</label>
+
+                <input class="registro-input"
+                       value="@(string.IsNullOrWhiteSpace(Model.Tomo) ? "No registrado" : Model.Tomo)"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Folio</label>
+
+                <input class="registro-input"
+                       value="@(string.IsNullOrWhiteSpace(Model.Folio) ? "No registrado" : Model.Folio)"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Asiento</label>
+
+                <input class="registro-input"
+                       value="@(string.IsNullOrWhiteSpace(Model.Asiento) ? "No registrado" : Model.Asiento)"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Fecha de registro</label>
+
+                <input class="registro-input"
+                       value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")"
+                       readonly />
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         CLASIFICACIÓN Y UBICACIÓN
+         ========================================= -->
+    <div class="registro-seccion">
+
+        <h3 class="registro-seccion-titulo">
+            Clasificación y ubicación
+        </h3>
+
+        <div class="registro-grid">
+
+            <div class="registro-campo">
+                <label>Estado</label>
+
+                <input class="registro-input"
+                       value="@(Model.EstadoActivo?.Estado ?? "Sin estado")"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Ubicación</label>
+
+                <input class="registro-input"
+                       value="@(Model.Ubicacion?.UbicacionNombre ?? "Sin ubicación")"
+                       readonly />
+            </div>
+
+            <div class="registro-campo">
+                <label>Modo de adquisición</label>
+
+                <input class="registro-input"
+                       value="@(Model.ModoAdquisicion?.NombreModoAdquisicion ?? "Sin modo")"
+                       readonly />
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         OBSERVACIONES
+         ========================================= -->
+    <div class="registro-seccion">
+
+        <h3 class="registro-seccion-titulo">
+            Observaciones
+        </h3>
+
+        <div class="registro-grid">
+
+            <div class="registro-campo registro-campo-completo">
+
+                <label>Observación</label>
+
+                <textarea class="registro-textarea"
+                          readonly>@(string.IsNullOrWhiteSpace(Model.Observacion) ? "Sin observaciones" : Model.Observacion)</textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         BOTONES
+         ========================================= -->
+    <div class="registro-botones">
+
+        <a asp-controller="Inventario"
+           asp-action="Index"
+           class="btn-accion">
+            Volver al inventario
+        </a>
+
+    </div>
+
+</div>

@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "Reportes";
+}
+
+<div class="reportes-page">
+
+    <!-- =========================================
+         ENCABEZADO
+         ========================================= -->
+    <div class="reportes-header">
+
+        <div>
+            <h2 class="reportes-title">
+                Generar reportes
+            </h2>
+
+            <p class="reportes-subtitle">
+                Seleccione el tipo de reporte que desea consultar y generar.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         TARJETAS DE REPORTES
+         ========================================= -->
+    <div class="reportes-grid">
+
+
+        <!-- INVENTARIO GENERAL -->
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                📦
+            </div>
+
+            <div class="reporte-contenido">
+
+                <h3 class="reporte-titulo">
+                    Inventario general
+                </h3>
+
+                <p class="reporte-descripcion">
+                    Consulte todos los activos registrados en la institución,
+                    incluyendo ubicación, estado, marca, serie y modo de adquisición.
+                </p>
+
+                <div class="reporte-footer">
+
+                    <a asp-controller="Reportes"
+                       asp-action="InventarioGeneral"
+                       class="reporte-boton">
+
+                        Configurar reporte
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECURSOS POR UBICACIÓN -->
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                🏫
+            </div>
+
+            <div class="reporte-contenido">
+
+                <h3 class="reporte-titulo">
+                    Recursos por ubicación
+                </h3>
+
+                <p class="reporte-descripcion">
+                    Consulte los activos asignados a cada aula,
+                    oficina, almacén o ubicación institucional.
+                </p>
+
+                <div class="reporte-footer">
+
+                    <a asp-controller="Reportes"
+                       asp-action="RecursosPorUbicacion"
+                       class="reporte-boton">
+
+                        Configurar reporte
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EQUIPOS DAÑADOS -->
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                ⚠️
+            </div>
+
+            <div class="reporte-contenido">
+
+                <h3 class="reporte-titulo">
+                    Equipos dañados
+                </h3>
+
+                <p class="reporte-descripcion">
+                    Consulte los activos cuyo estado actual se encuentra
+                    registrado como dañado.
+                </p>
+
+                <div class="reporte-footer">
+
+                    <a asp-controller="Reportes"
+                       asp-action="EquiposDanados"
+                       class="reporte-boton">
+
+                        Configurar reporte
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EQUIPOS EN MANTENIMIENTO -->
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                🛠️
+            </div>
+
+            <div class="reporte-contenido">
+
+                <h3 class="reporte-titulo">
+                    Equipos en mantenimiento
+                </h3>
+
+                <p class="reporte-descripcion">
+                    Consulte los activos que se encuentran actualmente
+                    en mantenimiento y su información asociada.
+                </p>
+
+                <div class="reporte-footer">
+
+                    <a asp-controller="Reportes"
+                       asp-action="EquiposMantenimiento"
+                       class="reporte-boton">
+
+                        Configurar reporte
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- HISTORIAL DE MOVIMIENTOS -->
+        <div class="reporte-card">
+
+            <div class="reporte-icono">
+                🔄
+            </div>
+
+            <div class="reporte-contenido">
+
+                <h3 class="reporte-titulo">
+                    Historial de movimientos
+                </h3>
+
+                <p class="reporte-descripcion">
+                    Consulte los traslados realizados sobre los activos,
+                    incluyendo ubicación de origen, destino y responsable.
+                </p>
+
+                <div class="reporte-footer">
+
+                    <a asp-controller="Reportes"
+                       asp-action="HistorialMovimientos"
+                       class="reporte-boton">
+
+                        Configurar reporte
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

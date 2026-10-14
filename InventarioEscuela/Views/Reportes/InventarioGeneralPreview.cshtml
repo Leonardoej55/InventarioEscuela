@@ -1,0 +1,549 @@
+﻿@model InventarioEscuela.ViewModels.ReporteInventarioGeneralViewModel
+
+@{
+    ViewData["Title"] = "Vista previa del inventario";
+
+    // =========================================
+    // VENTANA DE PÁGINAS
+    // =========================================
+    int paginasVisibles = 5;
+
+    int paginaInicio =
+        Math.Max(
+            1,
+            Model.PaginaActual - 2);
+
+    int paginaFin =
+        Math.Min(
+            Model.TotalPaginas,
+            paginaInicio + paginasVisibles - 1);
+
+    if (paginaFin - paginaInicio + 1 < paginasVisibles)
+    {
+        paginaInicio =
+            Math.Max(
+                1,
+                paginaFin - paginasVisibles + 1);
+    }
+}
+
+
+<div class="dashboard-page">
+
+
+    <!-- =========================================
+         ENCABEZADO
+         ========================================= -->
+    <h2 class="dashboard-section-title">
+        Vista previa - Inventario general
+    </h2>
+
+
+    <div style="
+        margin-bottom:15px;
+        font-size:11px;
+        color:#666;">
+
+        Revise la información antes de generar
+        el documento PDF.
+
+    </div>
+
+
+    <!-- =========================================
+         RESUMEN
+         ========================================= -->
+    <div class="dashboard-resumen">
+
+
+        <!-- TOTAL -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                📦
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalResultados
+                </div>
+
+                <div class="dashboard-card-title">
+                    Activos incluidos
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FUNCIONALES -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                ✅
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalFuncionales
+                </div>
+
+                <div class="dashboard-card-title">
+                    Funcionales
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DAÑADOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon dashboard-danger-icon">
+                ⚠️
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalDanados
+                </div>
+
+                <div class="dashboard-card-title">
+                    Dañados
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MANTENIMIENTO -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                🛠️
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalMantenimiento
+                </div>
+
+                <div class="dashboard-card-title">
+                    En mantenimiento
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         INFORMACIÓN DE RESULTADOS
+         ========================================= -->
+    <div style="
+        margin-top:10px;
+        margin-bottom:8px;
+        font-size:11px;
+        color:#666;">
+
+        Mostrando
+
+        <strong>
+
+            @(
+                Model.TotalResultados == 0
+                ? 0
+                : ((Model.PaginaActual - 1)
+                    * Model.TamanoPagina) + 1
+            )
+
+        </strong>
+
+        -
+
+        <strong>
+
+            @Math.Min(
+                Model.PaginaActual *
+                Model.TamanoPagina,
+                Model.TotalResultados)
+
+        </strong>
+
+        de
+
+        <strong>
+            @Model.TotalResultados
+        </strong>
+
+        activos.
+
+    </div>
+
+
+    <!-- =========================================
+         TABLA
+         ========================================= -->
+    <div class="dashboard-table-container">
+
+        <table class="tabla-base dashboard-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Código
+                    </th>
+
+                    <th>
+                        Descripción
+                    </th>
+
+                    <th>
+                        Marca
+                    </th>
+
+                    <th>
+                        Serie
+                    </th>
+
+                    <th>
+                        Ubicación
+                    </th>
+
+                    <th>
+                        Estado
+                    </th>
+
+                    <th>
+                        Modo adquisición
+                    </th>
+
+                    <th>
+                        Fecha registro
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @if (Model.Activos.Any())
+                {
+                    foreach (var activo
+                        in Model.Activos)
+                    {
+                        <tr>
+
+
+                            <td>
+                                @activo.NumeroIdentificacion
+                            </td>
+
+
+                            <td>
+                                @activo.Descripcion
+                            </td>
+
+
+                            <td>
+
+                                @(activo.Marca?
+                                    .MarcaNombre
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(
+                                    activo.Serie)
+                                    ? "N/I"
+                                    : activo.Serie)
+
+                            </td>
+
+
+                            <td>
+
+                                @(activo.Ubicacion?
+                                    .UbicacionNombre
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <td>
+
+                                @(activo.EstadoActivo?
+                                    .Estado
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <td>
+
+                                @(activo.ModoAdquisicion?
+                                    .NombreModoAdquisicion
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <td>
+
+                                @(activo.FechaRegistro
+                                    .ToString(
+                                        "dd/MM/yyyy"))
+
+                            </td>
+
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="8"
+                            style="
+                            text-align:center;
+                            padding:14px;">
+
+                            No se encontraron activos
+                            para los filtros seleccionados.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PAGINACIÓN
+         ========================================= -->
+    @if (Model.TotalPaginas > 1)
+    {
+        <div class="dashboard-pagination">
+
+
+            <!-- PRIMERA / ANTERIOR -->
+            @if (Model.PaginaActual > 1)
+            {
+                <a asp-controller="Reportes"
+                   asp-action="InventarioGeneralPreview"
+                   asp-route-pagina="1"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+                   asp-route-serieFiltro="@Model.SerieFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idModoFiltro="@Model.IdModoFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Primera página">
+
+                    «
+
+                </a>
+
+
+                <a asp-controller="Reportes"
+                   asp-action="InventarioGeneralPreview"
+                   asp-route-pagina="@(Model.PaginaActual - 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+                   asp-route-serieFiltro="@Model.SerieFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idModoFiltro="@Model.IdModoFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Página anterior">
+
+                    ‹
+
+                </a>
+            }
+
+
+            <!-- NÚMEROS -->
+            @for (int i = paginaInicio;
+                  i <= paginaFin;
+                  i++)
+            {
+                if (i == Model.PaginaActual)
+                {
+                    <span class="dashboard-page-number active">
+
+                        @i
+
+                    </span>
+                }
+                else
+                {
+                    <a asp-controller="Reportes"
+                       asp-action="InventarioGeneralPreview"
+                       asp-route-pagina="@i"
+                       asp-route-codigoFiltro="@Model.CodigoFiltro"
+                       asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                       asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+                       asp-route-serieFiltro="@Model.SerieFiltro"
+                       asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                       asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                       asp-route-idModoFiltro="@Model.IdModoFiltro"
+                       asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                       asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                       class="dashboard-page-number">
+
+                        @i
+
+                    </a>
+                }
+            }
+
+
+            <!-- SIGUIENTE / ÚLTIMA -->
+            @if (Model.PaginaActual <
+                Model.TotalPaginas)
+            {
+                <a asp-controller="Reportes"
+                   asp-action="InventarioGeneralPreview"
+                   asp-route-pagina="@(Model.PaginaActual + 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+                   asp-route-serieFiltro="@Model.SerieFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idModoFiltro="@Model.IdModoFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Página siguiente">
+
+                    ›
+
+                </a>
+
+
+                <a asp-controller="Reportes"
+                   asp-action="InventarioGeneralPreview"
+                   asp-route-pagina="@Model.TotalPaginas"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+                   asp-route-serieFiltro="@Model.SerieFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idModoFiltro="@Model.IdModoFiltro"
+                   asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                   asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                   class="dashboard-page-arrow"
+                   title="Última página">
+
+                    »
+
+                </a>
+            }
+
+        </div>
+
+
+        <!-- INFORMACIÓN DE PÁGINA -->
+        <div style="
+            text-align:right;
+            margin-top:5px;
+            font-size:10px;
+            color:#777;">
+
+            Página
+
+            <strong>
+                @Model.PaginaActual
+            </strong>
+
+            de
+
+            <strong>
+                @Model.TotalPaginas
+            </strong>
+
+        </div>
+    }
+
+
+    <!-- =========================================
+         BOTONES
+         ========================================= -->
+    <div class="registro-botones">
+
+
+        <!-- MODIFICAR FILTROS -->
+        <a asp-controller="Reportes"
+           asp-action="InventarioGeneral"
+           asp-route-codigoFiltro="@Model.CodigoFiltro"
+           asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+           asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+           asp-route-serieFiltro="@Model.SerieFiltro"
+           asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+           asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+           asp-route-idModoFiltro="@Model.IdModoFiltro"
+           asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+           asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+           class="btn-accion">
+
+            Modificar filtros
+
+        </a>
+
+
+        <!-- GENERAR PDF -->
+        @if (Model.TotalResultados > 0)
+        {
+            <a asp-controller="Reportes"
+               asp-action="GenerarInventarioGeneralPdf"
+               asp-route-codigoFiltro="@Model.CodigoFiltro"
+               asp-route-descripcionFiltro="@Model.DescripcionFiltro"
+               asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
+               asp-route-serieFiltro="@Model.SerieFiltro"
+               asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+               asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+               asp-route-idModoFiltro="@Model.IdModoFiltro"
+               asp-route-fechaDesde="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+               asp-route-fechaHasta="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+               class="btn-registrar">
+
+                Generar PDF
+
+            </a>
+        }
+
+    </div>
+
+</div>

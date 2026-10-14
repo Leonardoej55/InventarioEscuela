@@ -1,0 +1,730 @@
+﻿@model InventarioEscuela.ViewModels.MantenimientoIndexViewModel
+
+@{
+    ViewData["Title"] = "Mantenimiento";
+
+    // =========================================
+    // VENTANA DE PÁGINAS
+    // =========================================
+    int paginasVisibles = 5;
+
+    int paginaInicio =
+        Math.Max(
+            1,
+            Model.PaginaActual - 2);
+
+    int paginaFin =
+        Math.Min(
+            Model.TotalPaginas,
+            paginaInicio + paginasVisibles - 1);
+
+    if (paginaFin - paginaInicio + 1 < paginasVisibles)
+    {
+        paginaInicio =
+            Math.Max(
+                1,
+                paginaFin - paginasVisibles + 1);
+    }
+}
+
+
+<div class="dashboard-page">
+
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="dashboard-section-title">
+        Mantenimiento de activos
+    </h2>
+
+
+    <!-- =========================================
+         DASHBOARD
+         ========================================= -->
+    <div class="dashboard-resumen">
+
+
+        <!-- TOTAL MANTENIMIENTOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                🛠️
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.TotalMantenimientos
+                </div>
+
+                <div class="dashboard-card-title">
+                    Total mantenimientos
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVOS ATENDIDOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                📦
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.ActivosConMantenimiento
+                </div>
+
+                <div class="dashboard-card-title">
+                    Activos atendidos
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ESTE MES -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                🗓️
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.MantenimientosEsteMes
+                </div>
+
+                <div class="dashboard-card-title">
+                    Este mes
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVOS DAÑADOS -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon dashboard-danger-icon">
+                ⚠️
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.ActivosDanados
+                </div>
+
+                <div class="dashboard-card-title">
+                    Activos dañados
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EN MANTENIMIENTO -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-card-icon">
+                🔧
+            </div>
+
+            <div class="dashboard-card-content">
+
+                <div class="dashboard-card-number">
+                    @Model.ActivosEnMantenimiento
+                </div>
+
+                <div class="dashboard-card-title">
+                    En mantenimiento
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         FILTROS
+         ========================================= -->
+    <div class="filtros-container">
+
+        <div class="filtros-titulo">
+            Filtros
+        </div>
+
+
+        <form asp-controller="Mantenimiento"
+              asp-action="Index"
+              method="get"
+              class="filtros">
+
+
+            <!-- CÓDIGO -->
+            <input type="text"
+                   name="codigoFiltro"
+                   value="@Model.CodigoFiltro"
+                   class="filtro-input"
+                   placeholder="Código" />
+
+
+            <!-- DESCRIPCIÓN ACTIVO -->
+            <input type="text"
+                   name="descripcionActivoFiltro"
+                   value="@Model.DescripcionActivoFiltro"
+                   class="filtro-input filtro-nombre"
+                   placeholder="Descripción activo" />
+
+
+            <!-- UBICACIÓN -->
+            <select name="idUbicacionFiltro"
+                    class="filtro-select filtro-ubicacion">
+
+                <option value="">
+                    Ubicación
+                </option>
+
+                @foreach (var ubicacion in Model.Ubicaciones)
+                {
+                    if (Model.IdUbicacionFiltro ==
+                        ubicacion.IdUbicacion)
+                    {
+                        <option value="@ubicacion.IdUbicacion"
+                                selected>
+
+                            @ubicacion.UbicacionNombre
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@ubicacion.IdUbicacion">
+
+                            @ubicacion.UbicacionNombre
+
+                        </option>
+                    }
+                }
+
+            </select>
+
+
+            <!-- ESTADO -->
+            <select name="idEstadoFiltro"
+                    class="filtro-select">
+
+                <option value="">
+                    Estado
+                </option>
+
+                @foreach (var estado in Model.Estados)
+                {
+                    if (Model.IdEstadoFiltro ==
+                        estado.IdEstado)
+                    {
+                        <option value="@estado.IdEstado"
+                                selected>
+
+                            @estado.Estado
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@estado.IdEstado">
+
+                            @estado.Estado
+
+                        </option>
+                    }
+                }
+
+            </select>
+
+
+            <!-- TIPO MANTENIMIENTO -->
+            <select name="idTipoFiltro"
+                    class="filtro-select mantenimiento">
+
+                <option value="">
+                    Tipo mantenimiento
+                </option>
+
+                @foreach (var tipo in Model.TiposMantenimiento)
+                {
+                    if (Model.IdTipoFiltro ==
+                        tipo.IdTipo)
+                    {
+                        <option value="@tipo.IdTipo"
+                                selected>
+
+                            @tipo.Mantenimiento
+
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@tipo.IdTipo">
+
+                            @tipo.Mantenimiento
+
+                        </option>
+                    }
+                }
+
+            </select>
+
+
+            <!-- RESPONSABLE -->
+            <input type="text"
+                   name="responsableFiltro"
+                   value="@Model.ResponsableFiltro"
+                   class="filtro-input"
+                   placeholder="Responsable" />
+
+
+            <!-- DESCRIPCIÓN MANTENIMIENTO -->
+            <input type="text"
+                   name="descripcionMantenimientoFiltro"
+                   value="@Model.DescripcionMantenimientoFiltro"
+                   class="filtro-input mantenimiento"
+                   placeholder="Descripción mantenimiento" />
+
+
+            <!-- BUSCAR -->
+            <button type="submit"
+                    class="btn-buscar">
+
+                Buscar
+
+            </button>
+
+
+            <!-- LIMPIAR -->
+            <a asp-controller="Mantenimiento"
+               asp-action="Index"
+               class="btn-limpiar"
+               style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                text-decoration:none;">
+
+                Limpiar filtros
+
+            </a>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================
+         INFORMACIÓN DE RESULTADOS
+         ========================================= -->
+    <div style="
+        margin-bottom:8px;
+        font-size:11px;
+        color:#666;">
+
+        Mostrando
+
+        <strong>
+
+            @(
+                Model.TotalResultados == 0
+                ? 0
+                : ((Model.PaginaActual - 1)
+                    * Model.TamanoPagina) + 1
+            )
+
+        </strong>
+
+        -
+
+        <strong>
+
+            @Math.Min(
+                Model.PaginaActual *
+                Model.TamanoPagina,
+                Model.TotalResultados)
+
+        </strong>
+
+        de
+
+        <strong>
+            @Model.TotalResultados
+        </strong>
+
+        mantenimientos.
+
+    </div>
+
+
+    <!-- =========================================
+         TABLA
+         ========================================= -->
+    <div class="dashboard-table-container">
+
+        <table class="tabla-base dashboard-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Fecha
+                    </th>
+
+                    <th>
+                        Código
+                    </th>
+
+                    <th>
+                        Descripción activo
+                    </th>
+
+                    <th>
+                        Ubicación
+                    </th>
+
+                    <th>
+                        Estado actual
+                    </th>
+
+                    <th>
+                        Tipo mantenimiento
+                    </th>
+
+                    <th>
+                        Responsable
+                    </th>
+
+                    <th>
+                        Descripción mantenimiento
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                @if (Model.Mantenimientos.Any())
+                {
+                    foreach (var mantenimiento
+                        in Model.Mantenimientos)
+                    {
+                        <tr>
+
+
+                            <!-- FECHA -->
+                            <td>
+
+                                @(mantenimiento
+                                    .FechaMantenimiento
+                                    .ToString("dd/MM/yyyy"))
+
+                            </td>
+
+
+                            <!-- CÓDIGO -->
+                            <td>
+
+                                @(mantenimiento.Activo?
+                                    .NumeroIdentificacion
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <!-- DESCRIPCIÓN ACTIVO -->
+                            <td>
+
+                                @(mantenimiento.Activo?
+                                    .Descripcion
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <!-- UBICACIÓN -->
+                            <td>
+
+                                @(mantenimiento.Activo?
+                                    .Ubicacion?
+                                    .UbicacionNombre
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <!-- ESTADO ACTUAL -->
+                            <td>
+
+                                @(mantenimiento.Activo?
+                                    .EstadoActivo?
+                                    .Estado
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <!-- TIPO -->
+                            <td>
+
+                                @(mantenimiento
+                                    .TipoMantenimiento?
+                                    .Mantenimiento
+                                    ?? "N/I")
+
+                            </td>
+
+
+                            <!-- RESPONSABLE -->
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(
+                                    mantenimiento.Responsable)
+                                    ? "N/I"
+                                    : mantenimiento.Responsable)
+
+                            </td>
+
+
+                            <!-- DESCRIPCIÓN MANTENIMIENTO -->
+                            <td>
+
+                                @(string.IsNullOrWhiteSpace(
+                                    mantenimiento.Descripcion)
+                                    ? "Sin descripción"
+                                    : mantenimiento.Descripcion)
+
+                            </td>
+
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+
+                        <td colspan="8"
+                            style="
+                            text-align:center;
+                            padding:14px;">
+
+                            No se encontraron mantenimientos
+                            con los filtros seleccionados.
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =========================================
+         PAGINACIÓN
+         ========================================= -->
+    @if (Model.TotalPaginas > 1)
+    {
+        <div class="dashboard-pagination">
+
+
+            <!-- =====================================
+                 PRIMERA / ANTERIOR
+                 ===================================== -->
+            @if (Model.PaginaActual > 1)
+            {
+
+                <!-- PRIMERA PÁGINA -->
+                <a asp-controller="Mantenimiento"
+                   asp-action="Index"
+                   asp-route-pagina="1"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionActivoFiltro="@Model.DescripcionActivoFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-descripcionMantenimientoFiltro="@Model.DescripcionMantenimientoFiltro"
+                   class="dashboard-page-arrow"
+                   title="Primera página">
+
+                    «
+
+                </a>
+
+
+                <!-- ANTERIOR -->
+                <a asp-controller="Mantenimiento"
+                   asp-action="Index"
+                   asp-route-pagina="@(Model.PaginaActual - 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionActivoFiltro="@Model.DescripcionActivoFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-descripcionMantenimientoFiltro="@Model.DescripcionMantenimientoFiltro"
+                   class="dashboard-page-arrow"
+                   title="Página anterior">
+
+                    ‹
+
+                </a>
+            }
+
+
+            <!-- =====================================
+                 NÚMEROS DE PÁGINA
+                 ===================================== -->
+            @for (int i = paginaInicio;
+                  i <= paginaFin;
+                  i++)
+            {
+                if (i == Model.PaginaActual)
+                {
+                    <span class="dashboard-page-number active">
+
+                        @i
+
+                    </span>
+                }
+                else
+                {
+                    <a asp-controller="Mantenimiento"
+                       asp-action="Index"
+                       asp-route-pagina="@i"
+                       asp-route-codigoFiltro="@Model.CodigoFiltro"
+                       asp-route-descripcionActivoFiltro="@Model.DescripcionActivoFiltro"
+                       asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                       asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                       asp-route-idTipoFiltro="@Model.IdTipoFiltro"
+                       asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                       asp-route-descripcionMantenimientoFiltro="@Model.DescripcionMantenimientoFiltro"
+                       class="dashboard-page-number">
+
+                        @i
+
+                    </a>
+                }
+            }
+
+
+            <!-- =====================================
+                 SIGUIENTE / ÚLTIMA
+                 ===================================== -->
+            @if (Model.PaginaActual <
+                Model.TotalPaginas)
+            {
+
+                <!-- SIGUIENTE -->
+                <a asp-controller="Mantenimiento"
+                   asp-action="Index"
+                   asp-route-pagina="@(Model.PaginaActual + 1)"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionActivoFiltro="@Model.DescripcionActivoFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-descripcionMantenimientoFiltro="@Model.DescripcionMantenimientoFiltro"
+                   class="dashboard-page-arrow"
+                   title="Página siguiente">
+
+                    ›
+
+                </a>
+
+
+                <!-- ÚLTIMA PÁGINA -->
+                <a asp-controller="Mantenimiento"
+                   asp-action="Index"
+                   asp-route-pagina="@Model.TotalPaginas"
+                   asp-route-codigoFiltro="@Model.CodigoFiltro"
+                   asp-route-descripcionActivoFiltro="@Model.DescripcionActivoFiltro"
+                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
+                   asp-route-idEstadoFiltro="@Model.IdEstadoFiltro"
+                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
+                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
+                   asp-route-descripcionMantenimientoFiltro="@Model.DescripcionMantenimientoFiltro"
+                   class="dashboard-page-arrow"
+                   title="Última página">
+
+                    »
+
+                </a>
+            }
+
+        </div>
+
+
+        <!-- =====================================
+             INFORMACIÓN DE PÁGINA
+             ===================================== -->
+        <div style="
+            text-align:right;
+            margin-top:5px;
+            font-size:10px;
+            color:#777;">
+
+            Página
+
+            <strong>
+                @Model.PaginaActual
+            </strong>
+
+            de
+
+            <strong>
+                @Model.TotalPaginas
+            </strong>
+
+        </div>
+    }
+
+
+    <!-- =========================================
+         ACCIONES
+         ========================================= -->
+    <h2 class="dashboard-section-title acciones-title">
+        Acciones
+    </h2>
+
+
+    <div class="dashboard-actions">
+
+        <a asp-controller="Mantenimiento"
+           asp-action="Create"
+           class="dashboard-action-register">
+
+            Registrar mantenimiento
+
+        </a>
+
+    </div>
+
+</div>

@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Perfil";
+
+    string nombreUsuario =
+        ViewData["NombreUsuario"]?.ToString() ?? "Usuario";
+}
+
+<div class="dashboard-page">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="dashboard-section-title">
+        Perfil de usuario
+    </h2>
+
+
+    <!-- =========================================
+         TARJETAS
+         ========================================= -->
+    <div class="dashboard-resumen">
+
+        <div class="dashboard-card">
+            <div class="dashboard-card-icon">👤</div>
+            <div class="dashboard-card-content">
+                <div class="dashboard-card-number">
+                    @nombreUsuario
+                </div>
+                <div class="dashboard-card-title">
+                    Usuario actual
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dashboard-card">
+            <div class="dashboard-card-icon">🔐</div>
+            <div class="dashboard-card-content">
+                <div class="dashboard-card-number">
+                    Activa
+                </div>
+                <div class="dashboard-card-title">
+                    Sesión actual
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         PANEL
+         ========================================= -->
+    <div class="registro-seccion" style="margin-top: 20px;">
+
+        <h3 class="registro-seccion-titulo">
+            Opciones del perfil
+        </h3>
+
+        <div style="padding: 10px 0; font-size: 13px; color: #444;">
+            Desde aquí puedes centralizar en el futuro opciones como:
+            cambiar contraseña, editar información del usuario o revisar actividad de la cuenta.
+        </div>
+
+        <div class="dashboard-actions" style="margin-top: 15px;">
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="dashboard-action">
+                Volver al inicio
+            </a>
+
+            <a asp-controller="Home"
+               asp-action="CerrarSesion"
+               class="dashboard-action">
+                Cerrar sesión
+            </a>
+        </div>
+
+    </div>
+
+</div>

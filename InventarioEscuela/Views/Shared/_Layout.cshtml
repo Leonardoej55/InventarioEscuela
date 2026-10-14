@@ -1,0 +1,274 @@
+﻿@using System.Security.Claims
+
+@{
+    string controladorActual =
+        ViewContext.RouteData.Values["controller"]?.ToString()
+        ?? string.Empty;
+
+    string nombreUsuario =
+        User.FindFirst(ClaimTypes.Name)?.Value
+        ?? User.Identity?.Name
+        ?? "Usuario";
+}
+
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - Inventario Institucional
+    </title>
+
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+</head>
+
+
+<body>
+
+
+    <div class="sistema-container">
+
+
+        <!-- =========================================
+             MENÚ LATERAL
+             ========================================= -->
+        <aside class="menu-lateral">
+
+
+            <!-- =====================================
+                 LOGO
+                 ===================================== -->
+            <div class="logo-escuela">
+
+                <div class="nombre-escuela">
+
+                    Escuela<br />
+                    Proyecto<br />
+                    Pacuare
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 OPCIONES PRINCIPALES
+                 ===================================== -->
+            <nav class="opciones-menu">
+
+
+                <!-- PÁGINA PRINCIPAL -->
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="opcion-menu @(controladorActual == "Home" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        🏠
+                    </span>
+
+                    <span>
+                        Página principal
+                    </span>
+
+                </a>
+
+
+                <!-- INVENTARIO -->
+                <a asp-controller="Inventario"
+                   asp-action="Index"
+                   class="opcion-menu @(controladorActual == "Inventario" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        📦
+                    </span>
+
+                    <span>
+                        Inventario<br />
+                        institucional
+                    </span>
+
+                </a>
+
+
+                <!-- MOVIMIENTOS -->
+                <a asp-controller="Movimientos"
+                   asp-action="Index"
+                   class="opcion-menu @(controladorActual == "Movimientos" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        🏠
+                    </span>
+
+                    <span>
+                        Movimientos
+                    </span>
+
+                </a>
+
+
+                <!-- MANTENIMIENTO -->
+                <a asp-controller="Mantenimiento"
+                   asp-action="Index"
+                   class="opcion-menu @(controladorActual == "Mantenimiento" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        🛠️
+                    </span>
+
+                    <span>
+                        Mantenimiento
+                    </span>
+
+                </a>
+
+
+                <!-- REPORTES -->
+                <a asp-controller="Reportes"
+                   asp-action="Index"
+                   class="opcion-menu @(controladorActual == "Reportes" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        📋
+                    </span>
+
+                    <span>
+                        Reportes
+                    </span>
+
+                </a>
+
+            </nav>
+
+
+            <!-- =====================================
+                 PERFIL - PARTE INFERIOR
+                 ===================================== -->
+            <div class="perfil-sidebar-container">
+
+                <a asp-controller="Perfil"
+                   asp-action="Index"
+                   class="opcion-menu perfil-sidebar-link @(controladorActual == "Perfil" ? "activo" : "")">
+
+                    <span class="icono-menu">
+                        👤
+                    </span>
+
+                    <span>
+                        Perfil
+                    </span>
+
+                </a>
+
+            </div>
+
+
+        </aside>
+
+
+        <!-- =========================================
+             CONTENIDO DEL SISTEMA
+             ========================================= -->
+        <div class="contenido-sistema">
+
+
+            <!-- =====================================
+                 BARRA SUPERIOR
+                 ===================================== -->
+            <header class="barra-superior">
+
+
+                <!-- INFORMACIÓN DEL SISTEMA -->
+                <div class="titulo-sistema">
+
+                    <h1>
+                        Escuela Proyecto Pacuare
+                    </h1>
+
+                    <p class="subtitulo">
+
+                        Movimiento de activos -
+                        Registro y control del movimiento
+                        de los activos dentro de la escuela
+
+                    </p>
+
+                </div>
+
+
+                <!-- USUARIO -->
+                <div class="usuario-sistema">
+
+                    <span class="bienvenido">
+                        Bienvenido
+                    </span>
+
+
+                    <div class="user-info">
+
+                        <span class="user-name">
+                            @nombreUsuario
+                        </span>
+
+
+                        <a asp-controller="Login"
+                           asp-action="CerrarSesion"
+                           class="cerrar-sesion-link">
+
+                            Cerrar Sesión
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+            </header>
+
+
+            <!-- =====================================
+                 CONTENIDO
+                 ===================================== -->
+            <main class="contenido-principal"
+                  role="main">
+
+                @RenderBody()
+
+            </main>
+
+
+            <!-- =====================================
+                 PIE
+                 ===================================== -->
+            <footer class="pie-pagina">
+
+                © 2026 - Inventario Institucional
+
+            </footer>
+
+
+        </div>
+
+
+    </div>
+
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
+
+
+</body>
+
+</html>

@@ -1,0 +1,319 @@
+﻿@model InventarioEscuela.ViewModels.ReporteHistorialMovimientosViewModel
+
+@{
+    ViewData["Title"] = "Historial de movimientos";
+}
+
+<div class="registro-activo-container">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="titulo-inventario">
+        Reporte de historial de movimientos
+    </h2>
+
+
+    <p style="
+        margin-top:-5px;
+        margin-bottom:20px;
+        color:#666;
+        font-size:12px;">
+
+        Configure los filtros que desea aplicar.
+        El reporte incluirá los movimientos de activos
+        registrados en el sistema.
+
+    </p>
+
+
+    @if (TempData["ErrorReporte"] != null)
+    {
+        <div class="text-danger"
+             style="margin-bottom:15px;">
+
+            @TempData["ErrorReporte"]
+
+        </div>
+    }
+
+
+    <form asp-controller="Reportes"
+          asp-action="HistorialMovimientosPreview"
+          method="get">
+
+
+        <!-- =========================================
+             ACTIVO
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información del activo
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- CÓDIGO -->
+                <div class="registro-campo">
+
+                    <label>
+                        Código
+                    </label>
+
+                    <input type="text"
+                           name="codigoFiltro"
+                           value="@Model.CodigoFiltro"
+                           class="registro-input"
+                           placeholder="Número de identificación" />
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Descripción
+                    </label>
+
+                    <input type="text"
+                           name="descripcionFiltro"
+                           value="@Model.DescripcionFiltro"
+                           class="registro-input"
+                           placeholder="Descripción del activo" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             UBICACIONES
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Ubicaciones
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- ORIGEN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Ubicación origen
+                    </label>
+
+                    <select name="idUbicacionOrigenFiltro"
+                            class="registro-input">
+
+                        <option value="">
+                            Todas las ubicaciones
+                        </option>
+
+
+                        @foreach (var ubicacion
+                            in Model.Ubicaciones)
+                        {
+                            if (Model.IdUbicacionOrigenFiltro ==
+                                ubicacion.IdUbicacion)
+                            {
+                                <option value="@ubicacion.IdUbicacion"
+                                        selected>
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@ubicacion.IdUbicacion">
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- DESTINO -->
+                <div class="registro-campo">
+
+                    <label>
+                        Ubicación destino
+                    </label>
+
+                    <select name="idUbicacionDestinoFiltro"
+                            class="registro-input">
+
+                        <option value="">
+                            Todas las ubicaciones
+                        </option>
+
+
+                        @foreach (var ubicacion
+                            in Model.Ubicaciones)
+                        {
+                            if (Model.IdUbicacionDestinoFiltro ==
+                                ubicacion.IdUbicacion)
+                            {
+                                <option value="@ubicacion.IdUbicacion"
+                                        selected>
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@ubicacion.IdUbicacion">
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             DATOS DEL MOVIMIENTO
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información del movimiento
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- RESPONSABLE -->
+                <div class="registro-campo">
+
+                    <label>
+                        Responsable
+                    </label>
+
+                    <input type="text"
+                           name="responsableFiltro"
+                           value="@Model.ResponsableFiltro"
+                           class="registro-input"
+                           placeholder="Responsable" />
+
+                </div>
+
+
+                <!-- OBSERVACIÓN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Observación
+                    </label>
+
+                    <input type="text"
+                           name="observacionFiltro"
+                           value="@Model.ObservacionFiltro"
+                           class="registro-input"
+                           placeholder="Texto de la observación" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             RANGO DE FECHAS
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Rango de fechas
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- DESDE -->
+                <div class="registro-campo">
+
+                    <label>
+                        Desde
+                    </label>
+
+                    <input type="date"
+                           name="fechaDesde"
+                           value="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
+                           class="registro-input" />
+
+                </div>
+
+
+                <!-- HASTA -->
+                <div class="registro-campo">
+
+                    <label>
+                        Hasta
+                    </label>
+
+                    <input type="date"
+                           name="fechaHasta"
+                           value="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
+                           class="registro-input" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             BOTONES
+             ========================================= -->
+        <div class="registro-botones">
+
+            <a asp-controller="Reportes"
+               asp-action="Index"
+               class="btn-accion">
+
+                Volver a reportes
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                Vista previa
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

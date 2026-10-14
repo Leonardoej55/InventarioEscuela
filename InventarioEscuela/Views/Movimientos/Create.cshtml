@@ -1,0 +1,184 @@
+@model InventarioEscuela.ViewModels.MovimientoCreateViewModel
+
+@{
+    ViewData["Title"] = "Registrar movimiento";
+}
+
+<div class="registro-activo-container">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="titulo-inventario">
+        Registrar movimiento
+    </h2>
+
+
+    <!-- =========================================
+         FORMULARIO
+         ========================================= -->
+    <form asp-controller="Movimientos"
+          asp-action="Create"
+          method="post">
+
+
+        <!-- =========================================
+             ERRORES GENERALES
+             ========================================= -->
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger">
+        </div>
+
+
+        <!-- =========================================
+             INFORMACIÓN DEL MOVIMIENTO
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información del movimiento
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- =================================
+                     ACTIVO
+                     ================================= -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdActivo">
+                        Activo
+                    </label>
+
+                    <select asp-for="IdActivo"
+                            asp-items="ViewBag.Activos"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione un activo
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdActivo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- =================================
+                     UBICACIÓN DESTINO
+                     ================================= -->
+                <div class="registro-campo">
+
+                    <label asp-for="UbicacionDestino">
+                        Ubicación destino
+                    </label>
+
+                    <select asp-for="UbicacionDestino"
+                            asp-items="ViewBag.Ubicaciones"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione una ubicación
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="UbicacionDestino"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- =================================
+                     RESPONSABLE
+                     ================================= -->
+                <div class="registro-campo">
+
+                    <label asp-for="Responsable">
+                        Responsable
+                    </label>
+
+                    <input asp-for="Responsable"
+                           class="registro-input"
+                           placeholder="Nombre del responsable" />
+
+                    <span asp-validation-for="Responsable"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             OBSERVACIÓN
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Observación
+            </h3>
+
+
+            <div class="registro-campo">
+
+                <label asp-for="Observacion">
+                    Observación
+                </label>
+
+                <textarea asp-for="Observacion"
+                          class="registro-textarea"
+                          rows="4"
+                          placeholder="Ingrese una observación si es necesario">
+                </textarea>
+
+                <span asp-validation-for="Observacion"
+                      class="text-danger">
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             BOTONES
+             ========================================= -->
+        <div class="registro-botones">
+
+            <a asp-controller="Movimientos"
+               asp-action="Index"
+               class="btn-accion">
+
+                Cancelar
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                Registrar movimiento
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

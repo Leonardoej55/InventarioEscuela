@@ -1,0 +1,311 @@
+﻿@model InventarioEscuela.ViewModels.ReporteEquiposDanadosViewModel
+
+@{
+    ViewData["Title"] = "Equipos dañados";
+}
+
+<div class="registro-activo-container">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="titulo-inventario">
+        Reporte de equipos dañados
+    </h2>
+
+
+    <p style="
+        margin-top:-5px;
+        margin-bottom:20px;
+        color:#666;
+        font-size:12px;">
+
+        Configure los filtros que desea aplicar.
+        El reporte incluirá únicamente activos cuyo
+        estado corresponda a dañado o malo.
+
+    </p>
+
+
+    @if (TempData["ErrorReporte"] != null)
+    {
+        <div class="text-danger"
+             style="margin-bottom:15px;">
+
+            @TempData["ErrorReporte"]
+
+        </div>
+    }
+
+
+    <form asp-controller="Reportes"
+          asp-action="EquiposDanadosPreview"
+          method="get">
+
+
+        <!-- =========================================
+             IDENTIFICACIÓN
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Identificación del activo
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- CÓDIGO -->
+                <div class="registro-campo">
+
+                    <label>
+                        Código
+                    </label>
+
+                    <input type="text"
+                           name="codigoFiltro"
+                           value="@Model.CodigoFiltro"
+                           class="registro-input"
+                           placeholder="Número de identificación" />
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Descripción
+                    </label>
+
+                    <input type="text"
+                           name="descripcionFiltro"
+                           value="@Model.DescripcionFiltro"
+                           class="registro-input"
+                           placeholder="Descripción del activo" />
+
+                </div>
+
+
+                <!-- MARCA -->
+                <div class="registro-campo">
+
+                    <label>
+                        Marca
+                    </label>
+
+                    <select name="idMarcaFiltro"
+                            class="registro-input">
+
+                        <option value="">
+                            Todas las marcas
+                        </option>
+
+                        @foreach (var marca in Model.Marcas)
+                        {
+                            if (Model.IdMarcaFiltro ==
+                                marca.IdMarca)
+                            {
+                                <option value="@marca.IdMarca"
+                                        selected>
+
+                                    @marca.MarcaNombre
+
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@marca.IdMarca">
+
+                                    @marca.MarcaNombre
+
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             INFORMACIÓN TÉCNICA
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información técnica
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- MODELO -->
+                <div class="registro-campo">
+
+                    <label>
+                        Modelo
+                    </label>
+
+                    <input type="text"
+                           name="modeloFiltro"
+                           value="@Model.ModeloFiltro"
+                           class="registro-input"
+                           placeholder="Modelo" />
+
+                </div>
+
+
+                <!-- SERIE -->
+                <div class="registro-campo">
+
+                    <label>
+                        Serie
+                    </label>
+
+                    <input type="text"
+                           name="serieFiltro"
+                           value="@Model.SerieFiltro"
+                           class="registro-input"
+                           placeholder="Serie" />
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             UBICACIÓN Y ADQUISICIÓN
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Ubicación y adquisición
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- UBICACIÓN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Ubicación
+                    </label>
+
+                    <select name="idUbicacionFiltro"
+                            class="registro-input">
+
+                        <option value="">
+                            Todas las ubicaciones
+                        </option>
+
+                        @foreach (var ubicacion
+                            in Model.Ubicaciones)
+                        {
+                            if (Model.IdUbicacionFiltro ==
+                                ubicacion.IdUbicacion)
+                            {
+                                <option value="@ubicacion.IdUbicacion"
+                                        selected>
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@ubicacion.IdUbicacion">
+
+                                    @ubicacion.UbicacionNombre
+
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- MODO ADQUISICIÓN -->
+                <div class="registro-campo">
+
+                    <label>
+                        Modo de adquisición
+                    </label>
+
+                    <select name="idModoFiltro"
+                            class="registro-input">
+
+                        <option value="">
+                            Todos los modos
+                        </option>
+
+                        @foreach (var modo
+                            in Model.ModosAdquisicion)
+                        {
+                            if (Model.IdModoFiltro ==
+                                modo.IdModoAdquisicion)
+                            {
+                                <option value="@modo.IdModoAdquisicion"
+                                        selected>
+
+                                    @modo.NombreModoAdquisicion
+
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@modo.IdModoAdquisicion">
+
+                                    @modo.NombreModoAdquisicion
+
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             BOTONES
+             ========================================= -->
+        <div class="registro-botones">
+
+            <a asp-controller="Reportes"
+               asp-action="Index"
+               class="btn-accion">
+
+                Volver a reportes
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                Vista previa
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

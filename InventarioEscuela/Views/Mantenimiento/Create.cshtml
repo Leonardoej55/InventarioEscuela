@@ -1,0 +1,224 @@
+﻿@model InventarioEscuela.ViewModels.MantenimientoCreateViewModel
+
+@{
+    ViewData["Title"] = "Registrar mantenimiento";
+}
+
+<div class="registro-activo-container">
+
+    <!-- =========================================
+         TÍTULO
+         ========================================= -->
+    <h2 class="titulo-inventario">
+        Registrar mantenimiento
+    </h2>
+
+
+    <!-- =========================================
+         FORMULARIO
+         ========================================= -->
+    <form asp-controller="Mantenimiento"
+          asp-action="Create"
+          method="post">
+
+
+        <!-- =========================================
+             ERRORES GENERALES
+             ========================================= -->
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger">
+        </div>
+
+
+        <!-- =========================================
+             INFORMACIÓN DEL MANTENIMIENTO
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Información del mantenimiento
+            </h3>
+
+
+            <div class="registro-grid">
+
+
+                <!-- ACTIVO -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdActivo">
+                        Activo *
+                    </label>
+
+                    <select asp-for="IdActivo"
+                            asp-items="ViewBag.Activos"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione un activo
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdActivo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- TIPO -->
+                <div class="registro-campo">
+
+                    <label asp-for="IdTipo">
+                        Tipo de mantenimiento *
+                    </label>
+
+                    <select asp-for="IdTipo"
+                            asp-items="ViewBag.TiposMantenimiento"
+                            class="registro-input">
+
+                        <option value="">
+                            Seleccione un tipo de mantenimiento
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="IdTipo"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- FECHA -->
+                <div class="registro-campo">
+
+                    <label asp-for="FechaMantenimiento">
+                        Fecha de mantenimiento *
+                    </label>
+
+                    <input asp-for="FechaMantenimiento"
+                           type="date"
+                           class="registro-input" />
+
+                    <span asp-validation-for="FechaMantenimiento"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             RESPONSABLE
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Responsable
+            </h3>
+
+
+            <div class="registro-grid">
+
+                <div class="registro-campo">
+
+                    <label asp-for="Responsable">
+                        Responsable
+                    </label>
+
+                    <input asp-for="Responsable"
+                           class="registro-input"
+                           maxlength="150"
+                           placeholder="Nombre del responsable" />
+
+                    <span asp-validation-for="Responsable"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             OBSERVACIONES
+             ========================================= -->
+        <div class="registro-seccion">
+
+            <h3 class="registro-seccion-titulo">
+                Observaciones
+            </h3>
+
+
+            <div class="registro-campo">
+
+                <label asp-for="Descripcion">
+                    Observaciones del mantenimiento *
+                </label>
+
+                <textarea asp-for="Descripcion"
+                          class="registro-textarea"
+                          rows="4"
+                          maxlength="300"
+                          required
+                          placeholder="Describa el mantenimiento realizado, problema encontrado o trabajo efectuado">
+                </textarea>
+
+                <span asp-validation-for="Descripcion"
+                      class="text-danger">
+                </span>
+
+                <small style="
+                    display:block;
+                    margin-top:4px;
+                    color:#777;
+                    font-size:10px;">
+
+                    Campo obligatorio. Máximo 300 caracteres.
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================================
+             BOTONES
+             ========================================= -->
+        <div class="registro-botones">
+
+            <a asp-controller="Mantenimiento"
+               asp-action="Index"
+               class="btn-accion">
+
+                Cancelar
+
+            </a>
+
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                Registrar mantenimiento
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

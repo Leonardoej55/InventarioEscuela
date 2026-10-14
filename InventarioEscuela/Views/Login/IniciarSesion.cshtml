@@ -1,0 +1,527 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport"content="width=device-width, initial-scale=1.0" />
+
+    <title>Inicio de sesión - InventarioEscuela</title>
+
+    <style>
+
+            /* ==========================================
+               CONFIGURACIÓN GENERAL
+               ========================================== */
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+            }
+
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                background-color: #f5f1f1;
+            }
+
+
+            /* ==========================================
+               CONTENEDOR PRINCIPAL
+               ========================================== */
+
+            .login-container {
+                width: 100%;
+                height: 100vh;
+
+                display: flex;
+
+                overflow: hidden;
+            }
+
+
+            /* ==========================================
+               PANEL IZQUIERDO
+               ========================================== */
+
+            .left-panel {
+
+                width: 16.5%;
+                min-width: 190px;
+
+                height: 100vh;
+
+                background-color: #173b7a;
+
+                display: flex;
+                flex-direction: column;
+
+                justify-content: center;
+                align-items: center;
+
+                text-align: center;
+
+                padding: 20px;
+
+                border-right: 2px solid #111;
+            }
+
+
+            /* TÍTULO DEL PROYECTO */
+
+            .school-name {
+
+                color: #000000;
+
+                font-size: 22px;
+
+                font-weight: bold;
+
+                line-height: 1.35;
+
+                margin-bottom: 4px;
+            }
+
+
+            /* SUBTÍTULO */
+
+            .school-subtitle {
+
+                color: #e8e8e8;
+
+                font-size: 16px;
+
+                line-height: 1.4;
+            }
+
+
+            /* ==========================================
+               PANEL DERECHO
+               ========================================== */
+
+            .right-panel {
+
+                width: 83.5%;
+
+                height: 100vh;
+
+                background-color: #f5f1f1;
+
+                display: flex;
+
+                justify-content: center;
+
+                align-items: center;
+            }
+
+
+            /* ==========================================
+               CONTENEDOR DEL LOGIN
+               ========================================== */
+
+            .login-box {
+
+                width: 450px;
+
+                max-width: 90%;
+
+                text-align: center;
+
+                margin-top: -20px;
+            }
+
+
+            /* ==========================================
+               TÍTULO
+               ========================================== */
+
+            .login-title {
+
+                font-size: 21px;
+
+                font-weight: bold;
+
+                color: #333333;
+
+                margin-bottom: 26px;
+            }
+
+
+            /* ==========================================
+               FILAS DE LOS CAMPOS
+               ========================================== */
+
+            .input-row {
+
+                display: flex;
+
+                align-items: center;
+
+                justify-content: center;
+
+                margin-bottom: 20px;
+            }
+
+
+            /* ETIQUETAS */
+
+            .input-row label {
+
+                width: 120px;
+
+                text-align: right;
+
+                margin-right: 20px;
+
+                font-size: 18px;
+
+                color: #4a4a4a;
+            }
+
+
+            /* CAMPOS */
+
+            .input-row input {
+
+                width: 268px;
+
+                height: 22px;
+
+                padding: 3px 7px;
+
+                border: none;
+
+                outline: none;
+
+                background-color: #d9d9d9;
+
+                font-size: 15px;
+            }
+
+
+            /* EFECTO AL SELECCIONAR */
+
+            .input-row input:focus {
+
+                background-color: #eeeeee;
+
+                box-shadow: 0 0 0 1px #173b7a;
+            }
+
+
+            /* ==========================================
+               BOTÓN
+               ========================================== */
+
+            .button-container {
+
+                display: flex;
+
+                justify-content: flex-end;
+
+                margin-top: 32px;
+
+                padding-right: 0;
+            }
+
+
+            .login-button {
+
+                width: 100px;
+
+                height: 45px;
+
+                border: none;
+
+                background-color: #173b7a;
+
+                color: white;
+
+                font-size: 16px;
+
+                cursor: pointer;
+
+                transition: background-color 0.2s;
+            }
+
+
+            .login-button:hover {
+
+                background-color: #102d60;
+            }
+
+
+            .login-button:active {
+
+                transform: scale(0.98);
+            }
+
+
+            /* ==========================================
+               MENSAJE DE ERROR
+               ========================================== */
+
+            .error-message {
+
+                margin-top: 20px;
+
+                padding: 10px;
+
+                background-color: #f8d7da;
+
+                border: 1px solid #f1aeb5;
+
+                color: #842029;
+
+                font-size: 14px;
+
+                text-align: center;
+            }
+
+
+            /* ==========================================
+               REGISTRO
+               ========================================== */
+
+            .register-link {
+
+                margin-top: 20px;
+
+                font-size: 14px;
+
+                color: #555;
+            }
+
+            .register-link a {
+
+                color: #173b7a;
+
+                text-decoration: none;
+
+                font-weight: bold;
+            }
+
+            .register-link a:hover {
+
+                text-decoration: underline;
+            }
+
+
+            /* ==========================================
+               RESPONSIVE
+               ========================================== */
+
+            @@media (max-width: 768px) {
+
+                .left-panel {
+
+                    width: 30%;
+
+                    min-width: 150px;
+                }
+
+                .right-panel {
+
+                    width: 70%;
+                }
+
+                .school-name {
+
+                    font-size: 18px;
+                }
+
+                .school-subtitle {
+
+                    font-size: 13px;
+                }
+
+                .login-box {
+
+                    width: 95%;
+                }
+
+                .input-row {
+
+                    flex-direction: column;
+
+                    align-items: center;
+
+                    margin-bottom: 15px;
+                }
+
+                .input-row label {
+
+                    width: 100%;
+
+                    text-align: center;
+
+                    margin-right: 0;
+
+                    margin-bottom: 5px;
+                }
+
+                .input-row input {
+
+                    width: 90%;
+
+                    max-width: 268px;
+                }
+
+                .button-container {
+
+                    justify-content: center;
+                }
+            }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="login-container">
+
+
+        <!-- ======================================
+             PANEL IZQUIERDO
+             ======================================= -->
+
+        <div class="left-panel">
+
+            <div class="school-name">
+                Escuela Proyecto<br />
+                Pacuare
+            </div>
+
+            <div class="school-subtitle">
+                Gestion de inventario
+            </div>
+
+        </div>
+
+
+        <!-- ======================================
+             PANEL DERECHO
+             ======================================= -->
+
+        <div class="right-panel">
+
+
+            <!-- CONTENEDOR DEL LOGIN -->
+
+            <div class="login-box">
+
+
+                <!-- TÍTULO -->
+
+                <h1 class="login-title">
+                    Inicio de sesion
+                </h1>
+
+
+                <!-- FORMULARIO -->
+
+                <form asp-controller="Login"
+                      asp-action="IniciarSesion"
+                      method="post">
+
+
+                    <!-- CORREO -->
+
+                    <div class="input-row">
+
+                        <label for="correo">
+                            Usuario:
+                        </label>
+
+                        <input type="text"
+                               id="correo"
+                               name="correo"
+                               autocomplete="username"
+                               required />
+
+                    </div>
+
+
+                    <!-- CONTRASEÑA -->
+
+                    <div class="input-row">
+
+                        <label for="clave">
+                            Contraseña:
+                        </label>
+
+                        <input type="password"
+                               id="clave"
+                               name="clave"
+                               autocomplete="current-password"
+                               required />
+
+                    </div>
+
+
+                    <!-- BOTÓN -->
+
+                    <div class="button-container">
+
+                        <button type="submit"
+                                class="login-button">
+
+                            Log In
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- MENSAJE DE ERROR -->
+                    @if (ViewData["Mensaje"] != null)
+                    {
+
+                        <div class="error-message">
+
+                            @ViewData["Mensaje"]
+
+                        </div>
+
+                    }
+
+
+                    <!-- REGISTRO -->
+
+                    <div class="register-link">
+
+                        ¿No tienes una cuenta?
+
+                        <a asp-controller="Login"
+                           asp-action="Registro">
+
+                            Registrarse
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
