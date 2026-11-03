@@ -5,12 +5,12 @@ namespace InventarioEscuela.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // DbSets para cada tabla
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Activo> Activos { get; set; }
         public DbSet<EstadoActivo> EstadosActivos { get; set; }
@@ -25,19 +25,24 @@ namespace InventarioEscuela.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configurar relaciones y restricciones adicionales si es necesario
-            // Por ejemplo, la unicidad de NumeroIdentificacion ya está en la BD,
-            // pero Entity Framework no la conoce automáticamente, así que la agregamos:
             modelBuilder.Entity<Activo>()
                 .HasIndex(a => a.NumeroIdentificacion)
                 .IsUnique();
 
-            // Restricción de unicidad en Estado (EstadoActivo)
+            // La combinación es única cuando los tres campos tienen valor.
+            modelBuilder.Entity<Activo>()
+                .HasIndex(a => new { a.Tomo, a.Folio, a.Asiento })
+                .HasDatabaseName("UX_Activo_Tomo_Folio_Asiento")
+                .IsUnique()
+                .HasFilter(
+                    "[Tomo] IS NOT NULL AND " +
+                    "[Folio] IS NOT NULL AND " +
+                    "[Asiento] IS NOT NULL");
+
             modelBuilder.Entity<EstadoActivo>()
                 .HasIndex(e => e.Estado)
                 .IsUnique();
 
-            // Y así para las demás que tengan UNIQUE en la BD...
             modelBuilder.Entity<Marca>()
                 .HasIndex(m => m.MarcaNombre)
                 .IsUnique();
@@ -57,7 +62,6 @@ namespace InventarioEscuela.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Correo)
                 .IsUnique();
-
         }
     }
 }

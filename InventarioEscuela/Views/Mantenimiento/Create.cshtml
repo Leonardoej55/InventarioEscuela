@@ -2,50 +2,88 @@
 
 @{
     ViewData["Title"] = "Registrar mantenimiento";
+    bool esAdministrador = User.IsInRole("Administrador");
 }
+
+<style>
+    .catalogo-agregar {
+        align-self: flex-start;
+        margin-top: 8px;
+    }
+
+    .catalogo-dialogo {
+        width: min(440px, calc(100% - 32px));
+        max-height: calc(100% - 32px);
+        margin: auto;
+        padding: 24px;
+        overflow-y: auto;
+        border: 1px solid #c7c7c7;
+        border-radius: 10px;
+        background: white;
+        color: #333;
+        box-shadow: 0 12px 40px #0003;
+    }
+
+    .catalogo-dialogo::backdrop {
+        background: #0007;
+    }
+
+    .catalogo-ayuda,
+    .catalogo-mensaje {
+        margin: 10px 0;
+        font-size: 12px;
+    }
+
+    .catalogo-acciones {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .catalogo-dialogo button:disabled {
+        opacity: .6;
+        cursor: wait;
+    }
+
+    .catalogo-agregar:focus-visible,
+    .catalogo-dialogo button:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 3px;
+    }
+</style>
 
 <div class="registro-activo-container">
 
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
     <h2 class="titulo-inventario">
         Registrar mantenimiento
     </h2>
 
+    @if (esAdministrador)
+    {
+        <p id="catalogo-confirmacion"
+           class="catalogo-mensaje"
+           role="status"
+           aria-live="polite"></p>
+    }
 
-    <!-- =========================================
-         FORMULARIO
-         ========================================= -->
     <form asp-controller="Mantenimiento"
           asp-action="Create"
           method="post">
 
-
-        <!-- =========================================
-             ERRORES GENERALES
-             ========================================= -->
         <div asp-validation-summary="ModelOnly"
-             class="text-danger">
-        </div>
+             class="text-danger"></div>
 
-
-        <!-- =========================================
-             INFORMACIÓN DEL MANTENIMIENTO
-             ========================================= -->
         <div class="registro-seccion">
 
             <h3 class="registro-seccion-titulo">
                 Información del mantenimiento
             </h3>
 
-
             <div class="registro-grid">
 
-
-                <!-- ACTIVO -->
                 <div class="registro-campo">
-
                     <label asp-for="IdActivo">
                         Activo *
                     </label>
@@ -53,23 +91,16 @@
                     <select asp-for="IdActivo"
                             asp-items="ViewBag.Activos"
                             class="registro-input">
-
                         <option value="">
                             Seleccione un activo
                         </option>
-
                     </select>
 
                     <span asp-validation-for="IdActivo"
-                          class="text-danger">
-                    </span>
-
+                          class="text-danger"></span>
                 </div>
 
-
-                <!-- TIPO -->
                 <div class="registro-campo">
-
                     <label asp-for="IdTipo">
                         Tipo de mantenimiento *
                     </label>
@@ -77,23 +108,30 @@
                     <select asp-for="IdTipo"
                             asp-items="ViewBag.TiposMantenimiento"
                             class="registro-input">
-
                         <option value="">
                             Seleccione un tipo de mantenimiento
                         </option>
-
                     </select>
 
                     <span asp-validation-for="IdTipo"
-                          class="text-danger">
-                    </span>
+                          class="text-danger"></span>
 
+                    @if (esAdministrador)
+                    {
+                        <button type="button"
+                                class="btn-accion catalogo-agregar"
+                                data-catalogo="tipoMantenimiento"
+                                data-campo="IdTipo"
+                                data-limite="100"
+                                data-titulo="Agregar tipo de mantenimiento"
+                                aria-haspopup="dialog"
+                                aria-controls="catalogo-dialogo">
+                            + Agregar tipo de mantenimiento
+                        </button>
+                    }
                 </div>
 
-
-                <!-- FECHA -->
                 <div class="registro-campo">
-
                     <label asp-for="FechaMantenimiento">
                         Fecha de mantenimiento *
                     </label>
@@ -103,62 +141,46 @@
                            class="registro-input" />
 
                     <span asp-validation-for="FechaMantenimiento"
-                          class="text-danger">
-                    </span>
-
+                          class="text-danger"></span>
                 </div>
 
             </div>
 
         </div>
 
-
-        <!-- =========================================
-             RESPONSABLE
-             ========================================= -->
         <div class="registro-seccion">
 
             <h3 class="registro-seccion-titulo">
                 Responsable
             </h3>
 
-
             <div class="registro-grid">
-
                 <div class="registro-campo">
-
                     <label asp-for="Responsable">
-                        Responsable
+                        Responsable *
                     </label>
 
                     <input asp-for="Responsable"
                            class="registro-input"
+                           required
+                           aria-required="true"
                            maxlength="150"
                            placeholder="Nombre del responsable" />
 
                     <span asp-validation-for="Responsable"
-                          class="text-danger">
-                    </span>
-
+                          class="text-danger"></span>
                 </div>
-
             </div>
 
         </div>
 
-
-        <!-- =========================================
-             OBSERVACIONES
-             ========================================= -->
         <div class="registro-seccion">
 
             <h3 class="registro-seccion-titulo">
                 Observaciones
             </h3>
 
-
             <div class="registro-campo">
-
                 <label asp-for="Descripcion">
                     Observaciones del mantenimiento *
                 </label>
@@ -168,47 +190,28 @@
                           rows="4"
                           maxlength="300"
                           required
-                          placeholder="Describa el mantenimiento realizado, problema encontrado o trabajo efectuado">
-                </textarea>
+                          placeholder="Describa el mantenimiento realizado, problema encontrado o trabajo efectuado"></textarea>
 
                 <span asp-validation-for="Descripcion"
-                      class="text-danger">
-                </span>
+                      class="text-danger"></span>
 
-                <small style="
-                    display:block;
-                    margin-top:4px;
-                    color:#777;
-                    font-size:10px;">
-
+                <small style="display:block;margin-top:4px;color:#777;font-size:10px;">
                     Campo obligatorio. Máximo 300 caracteres.
-
                 </small>
-
             </div>
 
         </div>
 
-
-        <!-- =========================================
-             BOTONES
-             ========================================= -->
         <div class="registro-botones">
 
             <a asp-controller="Mantenimiento"
                asp-action="Index"
                class="btn-accion">
-
                 Cancelar
-
             </a>
 
-
-            <button type="submit"
-                    class="btn-registrar">
-
+            <button type="submit" class="btn-registrar">
                 Registrar mantenimiento
-
             </button>
 
         </div>
@@ -217,8 +220,252 @@
 
 </div>
 
+@if (esAdministrador)
+{
+    <dialog id="catalogo-dialogo"
+            class="catalogo-dialogo"
+            aria-labelledby="catalogo-titulo"
+            aria-describedby="catalogo-ayuda">
+
+        <h3 id="catalogo-titulo" class="registro-seccion-titulo">
+            Agregar opción
+        </h3>
+
+        <p id="catalogo-ayuda" class="catalogo-ayuda">
+            La opción se guardará en el sistema y quedará seleccionada para este mantenimiento.
+        </p>
+
+        <form id="catalogo-formulario"
+              asp-controller="Catalogos"
+              asp-action="Agregar"
+              method="post">
+
+            <input id="catalogo-tipo" type="hidden" name="tipo" />
+
+            <div class="registro-campo">
+                <label for="catalogo-nombre">
+                    Nombre
+                </label>
+
+                <input id="catalogo-nombre"
+                       name="nombre"
+                       class="registro-input"
+                       required
+                       maxlength="100"
+                       autocomplete="off"
+                       autofocus
+                       aria-describedby="catalogo-error" />
+            </div>
+
+            <p id="catalogo-error"
+               class="text-danger"
+               role="alert"
+               hidden></p>
+
+            <div class="catalogo-acciones">
+
+                <button id="catalogo-cancelar"
+                        type="button"
+                        class="btn-accion">
+                    Cancelar
+                </button>
+
+                <button id="catalogo-guardar"
+                        type="submit"
+                        class="btn-registrar">
+                    Guardar
+                </button>
+
+            </div>
+
+        </form>
+
+    </dialog>
+}
 
 @section Scripts
 {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(function () {
+            $('#Responsable').rules('add', {
+                normalizer: function (valor) {
+                    return valor.trim();
+                }
+            });
+        });
+    </script>
+
+    @if (esAdministrador)
+    {
+        <script>
+            (() => {
+                const dialogo = document.getElementById('catalogo-dialogo');
+                const formulario = document.getElementById('catalogo-formulario');
+                const nombre = document.getElementById('catalogo-nombre');
+                const tipo = document.getElementById('catalogo-tipo');
+                const error = document.getElementById('catalogo-error');
+                const guardar = document.getElementById('catalogo-guardar');
+                const cancelar = document.getElementById('catalogo-cancelar');
+                const confirmacion = document.getElementById('catalogo-confirmacion');
+
+                let campoDestino;
+                let guardando = false;
+
+                document.querySelectorAll('[data-catalogo]').forEach(boton => {
+                    boton.addEventListener('click', () => {
+                        formulario.reset();
+
+                        tipo.value = boton.dataset.catalogo;
+                        campoDestino = document.getElementById(boton.dataset.campo);
+                        nombre.maxLength = Number(boton.dataset.limite);
+
+                        document.getElementById('catalogo-titulo').textContent =
+                            boton.dataset.titulo;
+
+                        error.hidden = true;
+                        error.textContent = '';
+                        confirmacion.textContent = '';
+
+                        dialogo.showModal();
+                        nombre.focus();
+                    });
+                });
+
+                cancelar.addEventListener('click', () => {
+                    if (!guardando) {
+                        dialogo.close();
+                    }
+                });
+
+                dialogo.addEventListener('cancel', evento => {
+                    if (guardando) {
+                        evento.preventDefault();
+                    }
+                });
+
+                formulario.addEventListener('submit', async evento => {
+                    evento.preventDefault();
+
+                    if (guardando) {
+                        return;
+                    }
+
+                    error.hidden = true;
+                    nombre.value = nombre.value.trim();
+
+                    if (!nombre.value) {
+                        error.textContent = 'Ingrese un nombre.';
+                        error.hidden = false;
+                        nombre.focus();
+                        return;
+                    }
+
+                    if (!formulario.reportValidity()) {
+                        return;
+                    }
+
+                    guardando = true;
+                    guardar.disabled = true;
+                    cancelar.disabled = true;
+                    guardar.textContent = 'Guardando…';
+
+                    try {
+                        const respuesta = await fetch(formulario.action, {
+                            method: 'POST',
+                            body: new FormData(formulario),
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        if (respuesta.redirected || respuesta.status === 401) {
+                            throw new Error(
+                                'La sesión pudo haber vencido. Inicie sesión en otra pestaña y vuelva a intentarlo.'
+                            );
+                        }
+
+                        if (respuesta.status === 403) {
+                            throw new Error(
+                                'No tiene permiso para agregar esta opción.'
+                            );
+                        }
+
+                        const datos = await respuesta.json().catch(() => null);
+
+                        if (!respuesta.ok) {
+                            throw new Error(
+                                datos?.mensaje ||
+                                'No se pudo guardar. Compruebe su sesión e intente nuevamente.'
+                            );
+                        }
+
+                        if (
+                            !Number.isInteger(datos?.id) ||
+                            datos.id <= 0 ||
+                            typeof datos.nombre !== 'string'
+                        ) {
+                            throw new Error(
+                                'No se pudo confirmar el guardado. Compruebe si la opción ya existe antes de intentarlo nuevamente.'
+                            );
+                        }
+
+                        const valor = String(datos.id);
+
+                        let opcion = Array.from(campoDestino.options)
+                            .find(item => item.value === valor);
+
+                        if (!opcion) {
+                            opcion = new Option(datos.nombre, valor);
+
+                            const siguiente = Array.from(campoDestino.options)
+                                .find(item =>
+                                    item.value &&
+                                    item.text.localeCompare(
+                                        datos.nombre,
+                                        'es',
+                                        { sensitivity: 'base' }
+                                    ) > 0
+                                );
+
+                            campoDestino.insertBefore(
+                                opcion,
+                                siguiente || null
+                            );
+                        }
+
+                        campoDestino.value = valor;
+
+                        campoDestino.dispatchEvent(
+                            new Event('change', { bubbles: true })
+                        );
+
+                        $(campoDestino).valid();
+
+                        confirmacion.textContent =
+                            `Se agregó «${datos.nombre}» y quedó seleccionado.`;
+
+                        dialogo.close();
+                        campoDestino.focus();
+                    } catch (fallo) {
+                        error.textContent = fallo instanceof TypeError
+                            ? 'No se pudo confirmar el guardado. Revise su conexión y compruebe si la opción ya existe antes de reintentar.'
+                            : fallo.message;
+
+                        error.hidden = false;
+                        nombre.focus();
+                    } finally {
+                        guardando = false;
+                        guardar.disabled = false;
+                        cancelar.disabled = false;
+                        guardar.textContent = 'Guardar';
+                    }
+                });
+            })();
+        </script>
+    }
 }

@@ -31,9 +31,6 @@ namespace InventarioEscuela.Models
         [Required(ErrorMessage = "Debe seleccionar una marca.")]
         public int IdMarca { get; set; }
 
-        // =========================================
-        // MODELO DEL ACTIVO
-        // =========================================
         [StringLength(100)]
         public string? Modelo { get; set; }
 
@@ -52,12 +49,7 @@ namespace InventarioEscuela.Models
         [StringLength(500)]
         public string? Observacion { get; set; }
 
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
-
-
-        // =========================================
-        // PROPIEDADES DE NAVEGACIÓN
-        // =========================================
+        public DateTime FechaRegistro { get; set; }
 
         [ForeignKey(nameof(IdMarca))]
         [ValidateNever]
@@ -74,11 +66,6 @@ namespace InventarioEscuela.Models
         [ForeignKey(nameof(IdModo))]
         [ValidateNever]
         public ModoAdquisicion ModoAdquisicion { get; set; } = null!;
-
-
-        // =========================================
-        // RELACIONES
-        // =========================================
 
         [ValidateNever]
         public ICollection<Mantenimiento> Mantenimientos { get; set; }

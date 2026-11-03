@@ -1,81 +1,135 @@
-﻿@{
-    ViewData["Title"] = "Perfil";
+﻿@model InventarioEscuela.ViewModels.CambiarPasswordViewModel
 
+@{
+    ViewData["Title"] = "Perfil";
     string nombreUsuario =
         ViewData["NombreUsuario"]?.ToString() ?? "Usuario";
+
+    string? mensajeExito =
+        TempData["PasswordActualizado"] as string;
 }
 
 <div class="dashboard-page">
+    <h2 class="dashboard-section-title">Perfil de usuario</h2>
 
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
-    <h2 class="dashboard-section-title">
-        Perfil de usuario
-    </h2>
-
-
-    <!-- =========================================
-         TARJETAS
-         ========================================= -->
     <div class="dashboard-resumen">
-
         <div class="dashboard-card">
             <div class="dashboard-card-icon">👤</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @nombreUsuario
-                </div>
-                <div class="dashboard-card-title">
-                    Usuario actual
-                </div>
+                <div class="dashboard-card-number">@nombreUsuario</div>
+                <div class="dashboard-card-title">Usuario actual</div>
             </div>
         </div>
-
 
         <div class="dashboard-card">
             <div class="dashboard-card-icon">🔐</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    Activa
-                </div>
-                <div class="dashboard-card-title">
-                    Sesión actual
-                </div>
+                <div class="dashboard-card-number">Activa</div>
+                <div class="dashboard-card-title">Sesión actual</div>
             </div>
         </div>
-
     </div>
 
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <p role="status"
+           aria-live="polite"
+           style="margin-top:20px;color:#176b37;">
+            @mensajeExito
+        </p>
+    }
 
-    <!-- =========================================
-         PANEL
-         ========================================= -->
-    <div class="registro-seccion" style="margin-top: 20px;">
+    <div class="registro-seccion" style="margin-top:20px;">
+        <h3 class="registro-seccion-titulo">Cambiar contraseña</h3>
 
-        <h3 class="registro-seccion-titulo">
-            Opciones del perfil
-        </h3>
+        <p style="margin-bottom:15px;font-size:13px;color:#444;">
+            Ingrese su contraseña actual y una nueva contraseña
+            de entre 12 y 128 caracteres.
+        </p>
 
-        <div style="padding: 10px 0; font-size: 13px; color: #444;">
-            Desde aquí puedes centralizar en el futuro opciones como:
-            cambiar contraseña, editar información del usuario o revisar actividad de la cuenta.
-        </div>
+        <form asp-controller="Perfil"
+              asp-action="CambiarPassword"
+              method="post">
 
-        <div class="dashboard-actions" style="margin-top: 15px;">
-            <a asp-controller="Home"
-               asp-action="Index"
-               class="dashboard-action">
-                Volver al inicio
-            </a>
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger"
+                 role="alert"></div>
 
-            <a asp-controller="Home"
-               asp-action="CerrarSesion"
-               class="dashboard-action">
+            <div class="registro-grid">
+                <div class="registro-campo">
+                    <label asp-for="PasswordActual">
+                        Contraseña actual *
+                    </label>
+                    <input asp-for="PasswordActual"
+                           type="password"
+                           class="registro-input"
+                           autocomplete="current-password"
+                           required
+                           aria-required="true" />
+                    <span asp-validation-for="PasswordActual"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="registro-campo">
+                    <label asp-for="NuevoPassword">
+                        Nueva contraseña *
+                    </label>
+                    <input asp-for="NuevoPassword"
+                           type="password"
+                           class="registro-input"
+                           autocomplete="new-password"
+                           minlength="12"
+                           maxlength="128"
+                           required
+                           aria-required="true" />
+                    <span asp-validation-for="NuevoPassword"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="registro-campo">
+                    <label asp-for="ConfirmarPassword">
+                        Confirmar nueva contraseña *
+                    </label>
+                    <input asp-for="ConfirmarPassword"
+                           type="password"
+                           class="registro-input"
+                           autocomplete="new-password"
+                           maxlength="128"
+                           required
+                           aria-required="true" />
+                    <span asp-validation-for="ConfirmarPassword"
+                          class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="registro-botones">
+                <button type="submit" class="btn-registrar">
+                    Guardar nueva contraseña
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="dashboard-actions" style="margin-top:15px;">
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="dashboard-action">
+            Volver al inicio
+        </a>
+
+        <form asp-controller="Home"
+              asp-action="CerrarSesion"
+              method="post"
+              style="margin:0;">
+            <button type="submit" class="dashboard-action">
                 Cerrar sesión
-            </a>
-        </div>
-
+            </button>
+        </form>
     </div>
-
 </div>
+
+@section Scripts
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

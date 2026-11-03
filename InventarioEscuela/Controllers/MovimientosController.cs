@@ -14,20 +14,18 @@ namespace InventarioEscuela.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<MovimientosController> _logger;
+        private readonly RelojSistema _reloj;
 
         public MovimientosController(
             ApplicationDbContext context,
-            ILogger<MovimientosController> logger)
+            ILogger<MovimientosController> logger,
+            RelojSistema reloj)
         {
             _context = context;
             _logger = logger;
+            _reloj = reloj;
         }
 
-
-        // =========================================
-        // MOVIMIENTOS
-        // FILTROS + PAGINACIÓN
-        // =========================================
         [HttpGet]
         public async Task<IActionResult> Index(
             string? codigoFiltro,
@@ -41,10 +39,6 @@ namespace InventarioEscuela.Controllers
         {
             const int tamanoPagina = 10;
 
-
-            // =====================================
-            // CONSULTA BASE
-            // =====================================
             var consulta = _context.MovimientosActivos
                 .AsNoTracking()
                 .Include(m => m.Activo)
@@ -53,288 +47,140 @@ namespace InventarioEscuela.Controllers
                 .Include(m => m.MovimientosDestino)
                 .AsQueryable();
 
-
-            // =====================================
-            // FILTRO POR CÓDIGO
-            // =====================================
-            if (!string.IsNullOrWhiteSpace(
-                codigoFiltro))
+            if (!string.IsNullOrWhiteSpace(codigoFiltro))
             {
-                codigoFiltro =
-                    codigoFiltro.Trim();
-
+                codigoFiltro = codigoFiltro.Trim();
                 consulta = consulta.Where(m =>
-                    m.Activo.NumeroIdentificacion
-                        .Contains(codigoFiltro));
+                    m.Activo.NumeroIdentificacion.Contains(codigoFiltro));
             }
 
-
-            // =====================================
-            // FILTRO POR DESCRIPCIÓN
-            // =====================================
-            if (!string.IsNullOrWhiteSpace(
-                descripcionFiltro))
+            if (!string.IsNullOrWhiteSpace(descripcionFiltro))
             {
-                descripcionFiltro =
-                    descripcionFiltro.Trim();
-
+                descripcionFiltro = descripcionFiltro.Trim();
                 consulta = consulta.Where(m =>
-                    m.Activo.Descripcion
-                        .Contains(descripcionFiltro));
+                    m.Activo.Descripcion.Contains(descripcionFiltro));
             }
 
-
-            // =====================================
-            // FILTRO UBICACIÓN ORIGEN
-            // =====================================
             if (idUbicacionOrigenFiltro.HasValue)
-            {
                 consulta = consulta.Where(m =>
-                    m.UbicacionOrigen ==
-                    idUbicacionOrigenFiltro.Value);
-            }
+                    m.UbicacionOrigen == idUbicacionOrigenFiltro.Value);
 
-
-            // =====================================
-            // FILTRO UBICACIÓN DESTINO
-            // =====================================
             if (idUbicacionDestinoFiltro.HasValue)
-            {
                 consulta = consulta.Where(m =>
-                    m.UbicacionDestino ==
-                    idUbicacionDestinoFiltro.Value);
-            }
+                    m.UbicacionDestino == idUbicacionDestinoFiltro.Value);
 
-
-            // =====================================
-            // FILTRO FECHA
-            // =====================================
             if (fechaFiltro.HasValue)
             {
-                DateTime inicio =
-                    fechaFiltro.Value.Date;
-
-                DateTime fin =
-                    inicio.AddDays(1);
-
+                DateTime inicio = fechaFiltro.Value.Date;
+                DateTime fin = inicio.AddDays(1);
                 consulta = consulta.Where(m =>
-                    m.FechaMovimiento >= inicio &&
-                    m.FechaMovimiento < fin);
+                    m.FechaMovimiento >= inicio && m.FechaMovimiento < fin);
             }
 
-
-            // =====================================
-            // FILTRO ESTADO ACTUAL
-            // =====================================
             if (idEstadoFiltro.HasValue)
-            {
                 consulta = consulta.Where(m =>
-                    m.Activo.IdEstado ==
-                    idEstadoFiltro.Value);
-            }
+                    m.Activo.IdEstado == idEstadoFiltro.Value);
 
-
-            // =====================================
-            // FILTRO RESPONSABLE
-            // =====================================
-            if (!string.IsNullOrWhiteSpace(
-                responsableFiltro))
+            if (!string.IsNullOrWhiteSpace(responsableFiltro))
             {
-                responsableFiltro =
-                    responsableFiltro.Trim();
-
+                responsableFiltro = responsableFiltro.Trim();
                 consulta = consulta.Where(m =>
                     m.Responsable != null &&
-                    m.Responsable.Contains(
-                        responsableFiltro));
+                    m.Responsable.Contains(responsableFiltro));
             }
 
-
-            // =====================================
-            // TOTAL RESULTADOS FILTRADOS
-            // =====================================
-            int totalResultados =
-                await consulta.CountAsync();
-
-
-            // =====================================
-            // TOTAL PÁGINAS
-            // =====================================
-            int totalPaginas =
-                (int)Math.Ceiling(
-                    totalResultados /
-                    (double)tamanoPagina);
-
+            int totalResultados = await consulta.CountAsync();
+            int totalPaginas = (int)Math.Ceiling(
+                totalResultados / (double)tamanoPagina);
 
             if (pagina < 1)
-            {
                 pagina = 1;
-            }
 
-
-            if (totalPaginas > 0 &&
-                pagina > totalPaginas)
-            {
+            if (totalPaginas > 0 && pagina > totalPaginas)
                 pagina = totalPaginas;
-            }
 
+            var movimientos = await consulta
+                .OrderByDescending(m => m.FechaMovimiento)
+                .ThenByDescending(m => m.IdMovimiento)
+                .Skip((pagina - 1) * tamanoPagina)
+                .Take(tamanoPagina)
+                .ToListAsync();
 
-            // =====================================
-            // SOLO 10 MOVIMIENTOS
-            // =====================================
-            var movimientos =
-                await consulta
-                    .OrderByDescending(m =>
-                        m.FechaMovimiento)
-                    .ThenByDescending(m =>
-                        m.IdMovimiento)
-                    .Skip(
-                        (pagina - 1) *
-                        tamanoPagina)
-                    .Take(tamanoPagina)
-                    .ToListAsync();
+            int totalMovimientos = await _context.MovimientosActivos.CountAsync();
 
+            DateTime hoy = _reloj.Hoy;
+            DateTime manana = hoy.AddDays(1);
 
-            // =====================================
-            // DASHBOARD GENERAL
-            // =====================================
-            int totalMovimientos =
-                await _context.MovimientosActivos
-                    .CountAsync();
+            int movimientosHoy = await _context.MovimientosActivos.CountAsync(m =>
+                m.FechaMovimiento >= hoy && m.FechaMovimiento < manana);
 
+            int activosMovidos = await _context.MovimientosActivos
+                .Select(m => m.IdActivo).Distinct().CountAsync();
 
-            DateTime hoy =
-                DateTime.Today;
+            int ubicacionesDestino = await _context.MovimientosActivos
+                .Select(m => m.UbicacionDestino).Distinct().CountAsync();
 
-            DateTime manana =
-                hoy.AddDays(1);
+            var ubicaciones = await _context.Ubicaciones
+                .AsNoTracking()
+                .OrderBy(u => u.UbicacionNombre)
+                .ToListAsync();
 
+            var estados = await _context.EstadosActivos
+                .AsNoTracking()
+                .OrderBy(e => e.Estado)
+                .ToListAsync();
 
-            int movimientosHoy =
-                await _context.MovimientosActivos
-                    .CountAsync(m =>
-                        m.FechaMovimiento >= hoy &&
-                        m.FechaMovimiento < manana);
-
-
-            int activosMovidos =
-                await _context.MovimientosActivos
-                    .Select(m => m.IdActivo)
-                    .Distinct()
-                    .CountAsync();
-
-
-            int ubicacionesDestino =
-                await _context.MovimientosActivos
-                    .Select(m =>
-                        m.UbicacionDestino)
-                    .Distinct()
-                    .CountAsync();
-
-
-            // =====================================
-            // LISTAS PARA FILTROS
-            // =====================================
-            var ubicaciones =
-                await _context.Ubicaciones
-                    .AsNoTracking()
-                    .OrderBy(u =>
-                        u.UbicacionNombre)
-                    .ToListAsync();
-
-
-            var estados =
-                await _context.EstadosActivos
-                    .AsNoTracking()
-                    .OrderBy(e =>
-                        e.Estado)
-                    .ToListAsync();
-
-
-            // =====================================
-            // VIEWMODEL
-            // =====================================
-            var viewModel =
-                new MovimientoIndexViewModel
-                {
-                    Movimientos =
-                        movimientos,
-
-                    CodigoFiltro =
-                        codigoFiltro,
-
-                    DescripcionFiltro =
-                        descripcionFiltro,
-
-                    IdUbicacionOrigenFiltro =
-                        idUbicacionOrigenFiltro,
-
-                    IdUbicacionDestinoFiltro =
-                        idUbicacionDestinoFiltro,
-
-                    FechaFiltro =
-                        fechaFiltro,
-
-                    IdEstadoFiltro =
-                        idEstadoFiltro,
-
-                    ResponsableFiltro =
-                        responsableFiltro,
-
-                    Ubicaciones =
-                        ubicaciones,
-
-                    Estados =
-                        estados,
-
-                    TotalMovimientos =
-                        totalMovimientos,
-
-                    MovimientosHoy =
-                        movimientosHoy,
-
-                    ActivosMovidos =
-                        activosMovidos,
-
-                    UbicacionesDestino =
-                        ubicacionesDestino,
-
-                    PaginaActual =
-                        pagina,
-
-                    TamanoPagina =
-                        tamanoPagina,
-
-                    TotalResultados =
-                        totalResultados,
-
-                    TotalPaginas =
-                        totalPaginas
-                };
-
-
-            return View(viewModel);
+            return View(new MovimientoIndexViewModel
+            {
+                Movimientos = movimientos,
+                CodigoFiltro = codigoFiltro,
+                DescripcionFiltro = descripcionFiltro,
+                IdUbicacionOrigenFiltro = idUbicacionOrigenFiltro,
+                IdUbicacionDestinoFiltro = idUbicacionDestinoFiltro,
+                FechaFiltro = fechaFiltro,
+                IdEstadoFiltro = idEstadoFiltro,
+                ResponsableFiltro = responsableFiltro,
+                Ubicaciones = ubicaciones,
+                Estados = estados,
+                TotalMovimientos = totalMovimientos,
+                MovimientosHoy = movimientosHoy,
+                ActivosMovidos = activosMovidos,
+                UbicacionesDestino = ubicacionesDestino,
+                PaginaActual = pagina,
+                TamanoPagina = tamanoPagina,
+                TotalResultados = totalResultados,
+                TotalPaginas = totalPaginas
+            });
         }
 
-
-        // =========================================
-        // CREAR MOVIMIENTO
-        // =========================================
         [HttpGet]
         [Authorize(Roles = "Administrador,Secretario")]
         public async Task<IActionResult> Create(int? idActivo = null)
         {
-            var model = new MovimientoCreateViewModel { IdActivo = idActivo ?? 0 };
+            var model = new MovimientoCreateViewModel
+            {
+                IdActivo = idActivo ?? 0
+            };
+
             try
             {
-                if (idActivo.HasValue && !await _context.Activos.AnyAsync(a => a.IdActivo == idActivo.Value))
+                if (idActivo.HasValue &&
+                    !await _context.Activos.AnyAsync(a =>
+                        a.IdActivo == idActivo.Value))
                     return NotFound();
             }
-            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            catch (Exception ex)
+                when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
             {
-                _logger.LogError(ex, "Error al consultar el activo para un movimiento.");
-                ModelState.AddModelError(string.Empty, "No se pudo consultar el activo en este momento. Intente nuevamente.");
+                _logger.LogError(
+                    ex, "Error al consultar el activo para un movimiento.");
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "No se pudo consultar el activo en este momento. " +
+                    "Intente nuevamente.");
             }
+
             await CargarListasMovimiento(model.IdActivo);
             return View(model);
         }
@@ -342,44 +188,67 @@ namespace InventarioEscuela.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MovimientoCreateViewModel model)
+        public async Task<IActionResult> Create(
+            MovimientoCreateViewModel model)
         {
+            model.Responsable = model.Responsable?.Trim() ?? string.Empty;
+
             if (!ModelState.IsValid)
             {
-                await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                await CargarListasMovimiento(
+                    model.IdActivo, model.UbicacionDestino);
                 return View(model);
             }
 
             try
             {
-                var activo = await _context.Activos.AsNoTracking()
+                var activo = await _context.Activos
+                    .AsNoTracking()
                     .FirstOrDefaultAsync(a => a.IdActivo == model.IdActivo);
+
                 if (activo == null)
                 {
-                    ModelState.AddModelError(nameof(model.IdActivo), "El activo seleccionado no existe.");
+                    ModelState.AddModelError(
+                        nameof(model.IdActivo),
+                        "El activo seleccionado no existe.");
                 }
                 else if (activo.IdUbicacion == model.UbicacionDestino)
                 {
-                    ModelState.AddModelError(nameof(model.UbicacionDestino), "El activo ya se encuentra en esa ubicación.");
+                    ModelState.AddModelError(
+                        nameof(model.UbicacionDestino),
+                        "El activo ya se encuentra en esa ubicación.");
                 }
-                if (!await _context.Ubicaciones.AnyAsync(u => u.IdUbicacion == model.UbicacionDestino))
-                    ModelState.AddModelError(nameof(model.UbicacionDestino), "La ubicación de destino no existe.");
+
+                if (!await _context.Ubicaciones.AnyAsync(u =>
+                    u.IdUbicacion == model.UbicacionDestino))
+                    ModelState.AddModelError(
+                        nameof(model.UbicacionDestino),
+                        "La ubicación de destino no existe.");
 
                 if (!ModelState.IsValid)
                 {
-                    await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                    await CargarListasMovimiento(
+                        model.IdActivo, model.UbicacionDestino);
                     return View(model);
                 }
 
                 int ubicacionAnterior = activo!.IdUbicacion;
                 int filasActualizadas;
-                await using (var transaccion = await _context.Database.BeginTransactionAsync())
+
+                await using (
+                    var transaccion =
+                        await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
                         filasActualizadas = await _context.Activos
-                            .Where(a => a.IdActivo == model.IdActivo && a.IdUbicacion == ubicacionAnterior)
-                            .ExecuteUpdateAsync(setters => setters.SetProperty(a => a.IdUbicacion, model.UbicacionDestino));
+                            .Where(a =>
+                                a.IdActivo == model.IdActivo &&
+                                a.IdUbicacion == ubicacionAnterior)
+                            .ExecuteUpdateAsync(setters =>
+                                setters.SetProperty(
+                                    a => a.IdUbicacion,
+                                    model.UbicacionDestino));
 
                         if (filasActualizadas == 1)
                         {
@@ -388,11 +257,12 @@ namespace InventarioEscuela.Controllers
                                 IdActivo = activo.IdActivo,
                                 UbicacionOrigen = ubicacionAnterior,
                                 UbicacionDestino = model.UbicacionDestino,
-                                FechaMovimiento = DateTime.Now,
-                                Responsable = string.IsNullOrWhiteSpace(model.Responsable)
-                                    ? User.Identity?.Name ?? "Usuario" : model.Responsable.Trim(),
-                                Observacion = model.Observacion?.Trim() ?? string.Empty
+                                FechaMovimiento = _reloj.FechaHora,
+                                Responsable = model.Responsable,
+                                Observacion =
+                                    model.Observacion?.Trim() ?? string.Empty
                             });
+
                             await _context.SaveChangesAsync();
                             await transaccion.CommitAsync();
                         }
@@ -403,58 +273,94 @@ namespace InventarioEscuela.Controllers
                     }
                     catch
                     {
-                        // Conservar el error original aunque falle la limpieza de la transacción.
-                        try { await transaccion.RollbackAsync(); }
+                        try
+                        {
+                            await transaccion.RollbackAsync();
+                        }
                         catch (Exception rollbackError)
                         {
-                            _logger.LogError(rollbackError, "Error al revertir una transacción de movimiento.");
+                            _logger.LogError(
+                                rollbackError,
+                                "Error al revertir una transacción de movimiento.");
                         }
+
                         throw;
                     }
                 }
 
                 if (filasActualizadas != 1)
                 {
-                    ModelState.AddModelError(string.Empty,
-                        "La ubicación cambió mientras se procesaba el traslado, o el activo fue eliminado. " +
-                        "Consulte el inventario y revise el movimiento antes de intentarlo nuevamente.");
-                    await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "La ubicación cambió mientras se procesaba el traslado, " +
+                        "o el activo fue eliminado. Consulte el inventario y " +
+                        "revise el movimiento antes de intentarlo nuevamente.");
+
+                    await CargarListasMovimiento(
+                        model.IdActivo, model.UbicacionDestino);
                     return View(model);
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            catch (Exception ex)
+                when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
             {
-                _logger.LogError(ex, "Error de base de datos al registrar un movimiento.");
+                _logger.LogError(
+                    ex, "Error de base de datos al registrar un movimiento.");
+
                 _context.ChangeTracker.Clear();
-                ModelState.AddModelError(string.Empty, ErroresBaseDeDatos.MensajeGuardado(ex));
-                await CargarListasMovimiento(model.IdActivo, model.UbicacionDestino);
+
+                ModelState.AddModelError(
+                    string.Empty, ErroresBaseDeDatos.MensajeGuardado(ex));
+
+                await CargarListasMovimiento(
+                    model.IdActivo, model.UbicacionDestino);
+
                 return View(model);
             }
         }
 
-        private async Task CargarListasMovimiento(int? idActivo = null, int? idUbicacionDestino = null)
+        private async Task CargarListasMovimiento(
+            int? idActivo = null,
+            int? idUbicacionDestino = null)
         {
             try
             {
-                ViewBag.Activos = new SelectList(await _context.Activos.AsNoTracking()
-                    .OrderBy(a => a.NumeroIdentificacion).ToListAsync(), "IdActivo", "NumeroIdentificacion", idActivo);
-                ViewBag.Ubicaciones = new SelectList(await _context.Ubicaciones.AsNoTracking()
-                    .OrderBy(u => u.UbicacionNombre).ToListAsync(), "IdUbicacion", "UbicacionNombre", idUbicacionDestino);
+                ViewBag.Activos = new SelectList(
+                    await _context.Activos.AsNoTracking()
+                        .OrderBy(a => a.NumeroIdentificacion).ToListAsync(),
+                    "IdActivo", "NumeroIdentificacion", idActivo);
+
+                ViewBag.Ubicaciones = new SelectList(
+                    await _context.Ubicaciones.AsNoTracking()
+                        .OrderBy(u => u.UbicacionNombre).ToListAsync(),
+                    "IdUbicacion", "UbicacionNombre", idUbicacionDestino);
             }
-            catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
+            catch (Exception ex)
+                when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))
             {
-                _logger.LogError(ex, "Error al recargar las opciones de movimientos.");
-                ModelState.AddModelError(string.Empty, "No se pudieron cargar todas las opciones. Intente cargar el formulario nuevamente.");
+                _logger.LogError(
+                    ex, "Error al recargar las opciones de movimientos.");
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "No se pudieron cargar todas las opciones. " +
+                    "Intente cargar el formulario nuevamente.");
+
                 ViewData["Activos"] ??= OpcionesAnteriores(idActivo);
-                ViewData["Ubicaciones"] ??= OpcionesAnteriores(idUbicacionDestino);
+                ViewData["Ubicaciones"] ??=
+                    OpcionesAnteriores(idUbicacionDestino);
             }
         }
 
         private static List<SelectListItem> OpcionesAnteriores(int? id) =>
-            id > 0 ? new List<SelectListItem>
-            {
-                new SelectListItem("Selección anterior", id.Value.ToString())
-            } : new List<SelectListItem>();
+            id > 0
+                ? new List<SelectListItem>
+                {
+                    new SelectListItem(
+                        "Selección anterior", id.Value.ToString())
+                }
+                : new List<SelectListItem>();
     }
 }

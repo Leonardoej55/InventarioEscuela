@@ -32,10 +32,10 @@ namespace InventarioEscuela.Services
             string correoNormalizado =
                 correo.Trim().ToLowerInvariant();
 
-            Usuario? usuario =
-                await _context.Usuarios.FirstOrDefaultAsync(
-                    u => u.Correo.Trim().ToLower() ==
-                         correoNormalizado);
+            Usuario? usuario = await _context.Usuarios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u =>
+                    u.Correo.Trim().ToLower() == correoNormalizado);
 
             if (usuario == null ||
                 string.IsNullOrEmpty(usuario.PasswordHash))
@@ -47,19 +47,17 @@ namespace InventarioEscuela.Services
 
             try
             {
-                resultado =
-                    _passwordHasher.VerifyHashedPassword(
-                        usuario,
-                        usuario.PasswordHash,
-                        clave);
+                resultado = _passwordHasher.VerifyHashedPassword(
+                    usuario,
+                    usuario.PasswordHash,
+                    clave);
             }
             catch (FormatException)
             {
                 return null;
             }
 
-            if (resultado ==
-                PasswordVerificationResult.Failed)
+            if (resultado == PasswordVerificationResult.Failed)
             {
                 return null;
             }
@@ -67,26 +65,42 @@ namespace InventarioEscuela.Services
             if (resultado ==
                 PasswordVerificationResult.SuccessRehashNeeded)
             {
-                usuario.PasswordHash =
-                    _passwordHasher.HashPassword(
-                        usuario,
-                        clave);
+                string hashOriginal = usuario.PasswordHash;
 
-                await _context.SaveChangesAsync();
+                string hashActualizado = _passwordHasher.HashPassword(
+                    usuario,
+                    clave);
+
+                // Conservar cualquier cambio de contraseña concurrente.
+                int filasActualizadas = await _context.Usuarios
+                    .Where(u =>
+                        u.IdUsuario == usuario.IdUsuario &&
+                        EF.Functions.Collate(
+                            u.PasswordHash,
+                            "Latin1_General_100_BIN2") == hashOriginal)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(
+                            u => u.PasswordHash,
+                            hashActualizado));
+
+                if (filasActualizadas != 1)
+                {
+                    return null;
+                }
+
+                usuario.PasswordHash = hashActualizado;
             }
 
             return usuario;
         }
 
-        public async Task<bool> ExisteCorreo(
-            string correo)
+        public async Task<bool> ExisteCorreo(string correo)
         {
             string correoNormalizado =
                 correo.Trim().ToLowerInvariant();
 
-            return await _context.Usuarios.AnyAsync(
-                u => u.Correo.Trim().ToLower() ==
-                     correoNormalizado);
+            return await _context.Usuarios.AnyAsync(u =>
+                u.Correo.Trim().ToLower() == correoNormalizado);
         }
 
         public Task<bool> HayUsuarios()
@@ -98,11 +112,6 @@ namespace InventarioEscuela.Services
             Usuario usuario,
             string clave)
         {
-            /*
-             * Serializable evita que dos solicitudes
-             * creen simultáneamente dos administradores
-             * iniciales.
-             */
             await using var transaccion =
                 await _context.Database.BeginTransactionAsync(
                     IsolationLevel.Serializable);
@@ -114,10 +123,7 @@ namespace InventarioEscuela.Services
 
             usuario.Rol = "Administrador";
 
-            await SaveUsuario(
-                usuario,
-                clave);
-
+            await SaveUsuario(usuario, clave);
             await transaccion.CommitAsync();
 
             return true;
@@ -135,19 +141,16 @@ namespace InventarioEscuela.Services
                     nameof(usuario));
             }
 
-            usuario.Nombre =
-                usuario.Nombre.Trim();
+            usuario.Nombre = usuario.Nombre.Trim();
 
             usuario.Correo =
                 usuario.Correo.Trim().ToLowerInvariant();
 
-            usuario.PasswordHash =
-                _passwordHasher.HashPassword(
-                    usuario,
-                    clave);
+            usuario.PasswordHash = _passwordHasher.HashPassword(
+                usuario,
+                clave);
 
             _context.Usuarios.Add(usuario);
-
             await _context.SaveChangesAsync();
 
             return usuario;

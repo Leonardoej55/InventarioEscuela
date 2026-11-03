@@ -8,48 +8,48 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
-// =========================================
-// MVC + desactivar caché en las respuestas
-// =========================================
+
 builder.Services.AddControllersWithViews(opciones =>
 {
-    opciones.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((_, _) =>
-        "Revise el formato de este campo: debe indicar una fecha, un número o una opción válida.");
-    opciones.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(_ => "Ingrese un número válido.");
-    opciones.Filters.Add(
-        new ResponseCacheAttribute
-        {
-            NoStore = true,
-            Location = ResponseCacheLocation.None
-        });
+    opciones.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor(
+        (_, _) =>
+            "Revise el formato de este campo: debe indicar una fecha, un número o una opción válida.");
+
+    opciones.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(
+        _ => "Ingrese un número válido.");
+
+    opciones.Filters.Add(new ResponseCacheAttribute
+    {
+        NoStore = true,
+        Location = ResponseCacheLocation.None
+    });
 });
-// =========================================
-// BASE DE DATOS
-// =========================================
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("CadenaSQL")
-    );
+        builder.Configuration.GetConnectionString("CadenaSQL"));
 });
-// =========================================
-// SERVICIOS
-// =========================================
+
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 builder.Services.AddScoped<IReporteConsultaService, ReporteConsultaService>();
 builder.Services.AddScoped<IReportePdfService, ReportePdfService>();
 builder.Services.AddScoped<IReporteCsvService, ReporteCsvService>();
+
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<RelojSistema>();
+
 builder.Services.AddOptions<OpcionesReportes>()
     .Bind(builder.Configuration.GetSection(OpcionesReportes.Seccion))
-    .Validate(opciones => TimeZoneInfo.TryFindSystemTimeZoneById(opciones.ZonaHoraria, out _),
+    .Validate(
+        opciones => TimeZoneInfo.TryFindSystemTimeZoneById(
+            opciones.ZonaHoraria, out _),
         "La zona horaria de los reportes no es válida.")
     .ValidateOnStart();
-// =========================================
-// AUTENTICACIÓN POR COOKIES
-// =========================================
+
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(opciones =>
@@ -59,32 +59,29 @@ builder.Services
         opciones.ExpireTimeSpan = TimeSpan.FromMinutes(20);
         opciones.SlidingExpiration = true;
     });
+
 var app = builder.Build();
+
 QuestPDF.Settings.License = LicenseType.Community;
-// =========================================
-// MANEJO DE ERRORES
-// =========================================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-// =========================================
-// PIPELINE HTTP
-// =========================================
+
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapStaticAssets();
-// =========================================
-// RUTA PRINCIPAL
-// =========================================
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=IniciarSesion}/{id?}")
     .WithStaticAssets();
+
 app.Run();
 
-// Permite arrancar la aplicación completa en las pruebas sin cambiar su autenticación real.
 public partial class Program { }

@@ -23,7 +23,7 @@ namespace InventarioEscuela.Models
         public int UbicacionDestino { get; set; }
 
         [Column("FechaMovimiento")]
-        public DateTime FechaMovimiento { get; set; } = DateTime.Now;
+        public DateTime FechaMovimiento { get; set; }
 
         [Column("Responsable")]
         [StringLength(150)]
@@ -33,7 +33,6 @@ namespace InventarioEscuela.Models
         [StringLength(300)]
         public string Observacion { get; set; }
 
-        // Propiedades de navegación
         [ForeignKey("IdActivo")]
         public virtual Activo Activo { get; set; }
 
