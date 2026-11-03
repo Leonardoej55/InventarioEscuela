@@ -2,12 +2,22 @@
 
 @{
     string controladorActual =
-        ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+        ViewContext.RouteData.Values["controller"]?.ToString()
+        ?? string.Empty;
 
     string nombreUsuario =
         User.FindFirst(ClaimTypes.Name)?.Value
         ?? User.Identity?.Name
         ?? "Usuario";
+
+    bool esReportes = string.Equals(
+        controladorActual, "Reportes", StringComparison.OrdinalIgnoreCase);
+
+    bool esListado = string.Equals(
+        ViewContext.RouteData.Values["action"]?.ToString(),
+        "Index", StringComparison.OrdinalIgnoreCase)
+        && (string.Equals(controladorActual, "Home", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(controladorActual, "Inventario", StringComparison.OrdinalIgnoreCase));
 }
 
 <!DOCTYPE html>
@@ -15,15 +25,30 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - Inventario Institucional</title>
 
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
-</head>
-<body>
-    <div class="sistema-container">
 
+    @if (esReportes)
+    {
+        <link rel="stylesheet"
+              href="~/css/Reportes.css"
+              asp-append-version="true" />
+    }
+
+    @if (esListado)
+    {
+        <link rel="stylesheet"
+              href="~/css/Listados.css"
+              asp-append-version="true" />
+    }
+</head>
+
+<body class="@(esReportes ? "reportes-layout" : esListado ? "listado-layout" : null)">
+    <div class="sistema-container">
         <aside class="menu-lateral">
             <div class="logo-escuela">
                 <div class="nombre-escuela">
@@ -104,7 +129,9 @@
                     <span class="bienvenido">Bienvenido</span>
 
                     <div class="user-info">
-                        <span class="user-name">@nombreUsuario</span>
+                        <span class="user-name" title="@nombreUsuario">
+                            @nombreUsuario
+                        </span>
 
                         <form asp-controller="Home"
                               asp-action="CerrarSesion"

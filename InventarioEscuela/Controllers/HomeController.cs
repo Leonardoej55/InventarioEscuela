@@ -1,5 +1,6 @@
 using InventarioEscuela.Data;
 using InventarioEscuela.Models;
+using InventarioEscuela.Services.Reportes;
 using InventarioEscuela.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -36,6 +37,7 @@ namespace InventarioEscuela.Controllers
             int pagina = 1)
         {
             const int tamanoPagina = 10;
+
             string nombreUsuario =
                 User.FindFirst(ClaimTypes.Name)?.Value ?? "";
 
@@ -62,21 +64,25 @@ namespace InventarioEscuela.Controllers
             }
 
             if (idMarcaFiltro.HasValue)
-                consulta = consulta.Where(a => a.IdMarca == idMarcaFiltro.Value);
+                consulta = consulta.Where(a =>
+                    a.IdMarca == idMarcaFiltro.Value);
 
             if (idUbicacionFiltro.HasValue)
                 consulta = consulta.Where(a =>
                     a.IdUbicacion == idUbicacionFiltro.Value);
 
             if (idEstadoFiltro.HasValue)
-                consulta = consulta.Where(a => a.IdEstado == idEstadoFiltro.Value);
+                consulta = consulta.Where(a =>
+                    a.IdEstado == idEstadoFiltro.Value);
 
             if (fechaFiltro.HasValue)
             {
                 DateTime inicio = fechaFiltro.Value.Date;
                 DateTime fin = inicio.AddDays(1);
+
                 consulta = consulta.Where(a =>
-                    a.FechaRegistro >= inicio && a.FechaRegistro < fin);
+                    a.FechaRegistro >= inicio &&
+                    a.FechaRegistro < fin);
             }
 
             int totalResultados = await consulta.CountAsync();
@@ -97,17 +103,14 @@ namespace InventarioEscuela.Controllers
 
             int totalActivos = await _context.Activos.CountAsync();
 
-            int totalFuncionales = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "Funcional");
+            int totalFuncionales = await _context.Activos
+                .CountAsync(EstadosReporte.EsFuncional);
 
-            int totalDanados = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "Dañado");
+            int totalDanados = await _context.Activos
+                .CountAsync(EstadosReporte.EsDanado);
 
-            int totalMantenimiento = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "En mantenimiento");
+            int totalMantenimiento = await _context.Activos
+                .CountAsync(EstadosReporte.EsEnMantenimiento);
 
             int totalUbicacionesConActivos = await _context.Activos
                 .Select(a => a.IdUbicacion)

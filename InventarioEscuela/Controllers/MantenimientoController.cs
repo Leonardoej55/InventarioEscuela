@@ -1,6 +1,7 @@
 ﻿using InventarioEscuela.Data;
 using InventarioEscuela.Models;
 using InventarioEscuela.Services;
+using InventarioEscuela.Services.Reportes;
 using InventarioEscuela.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -115,7 +116,9 @@ namespace InventarioEscuela.Controllers
                     await _context.Mantenimientos.CountAsync();
 
                 int activosConMantenimiento = await _context.Mantenimientos
-                    .Select(m => m.IdActivo).Distinct().CountAsync();
+                    .Select(m => m.IdActivo)
+                    .Distinct()
+                    .CountAsync();
 
                 DateTime hoy = _reloj.Hoy;
                 DateTime inicioMes = new DateTime(hoy.Year, hoy.Month, 1);
@@ -126,14 +129,11 @@ namespace InventarioEscuela.Controllers
                         m.FechaMantenimiento >= inicioMes &&
                         m.FechaMantenimiento < inicioMesSiguiente);
 
-                int activosDanados = await _context.Activos.CountAsync(a =>
-                    a.EstadoActivo != null &&
-                    a.EstadoActivo.Estado == "Dañado");
+                int activosDanados = await _context.Activos
+                    .CountAsync(EstadosReporte.EsDanado);
 
-                int activosEnMantenimiento =
-                    await _context.Activos.CountAsync(a =>
-                        a.EstadoActivo != null &&
-                        a.EstadoActivo.Estado == "En mantenimiento");
+                int activosEnMantenimiento = await _context.Activos
+                    .CountAsync(EstadosReporte.EsEnMantenimiento);
 
                 var ubicaciones = await _context.Ubicaciones
                     .AsNoTracking()

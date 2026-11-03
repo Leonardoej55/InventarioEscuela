@@ -1,7 +1,8 @@
 ﻿using InventarioEscuela.Data;
 using InventarioEscuela.Models;
-using InventarioEscuela.ViewModels;
 using InventarioEscuela.Services;
+using InventarioEscuela.Services.Reportes;
+using InventarioEscuela.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -69,7 +70,8 @@ namespace InventarioEscuela.Controllers
             }
 
             if (idMarcaFiltro.HasValue)
-                consulta = consulta.Where(a => a.IdMarca == idMarcaFiltro.Value);
+                consulta = consulta.Where(a =>
+                    a.IdMarca == idMarcaFiltro.Value);
 
             if (!string.IsNullOrWhiteSpace(serieFiltro))
             {
@@ -99,17 +101,21 @@ namespace InventarioEscuela.Controllers
                     a.IdUbicacion == idUbicacionFiltro.Value);
 
             if (idEstadoFiltro.HasValue)
-                consulta = consulta.Where(a => a.IdEstado == idEstadoFiltro.Value);
+                consulta = consulta.Where(a =>
+                    a.IdEstado == idEstadoFiltro.Value);
 
             if (idModoFiltro.HasValue)
-                consulta = consulta.Where(a => a.IdModo == idModoFiltro.Value);
+                consulta = consulta.Where(a =>
+                    a.IdModo == idModoFiltro.Value);
 
             if (fechaFiltro.HasValue)
             {
                 DateTime inicio = fechaFiltro.Value.Date;
                 DateTime fin = inicio.AddDays(1);
+
                 consulta = consulta.Where(a =>
-                    a.FechaRegistro >= inicio && a.FechaRegistro < fin);
+                    a.FechaRegistro >= inicio &&
+                    a.FechaRegistro < fin);
             }
 
             int totalResultados = await consulta.CountAsync();
@@ -130,17 +136,14 @@ namespace InventarioEscuela.Controllers
 
             int totalActivos = await _context.Activos.CountAsync();
 
-            int totalFuncionales = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "Funcional");
+            int totalFuncionales = await _context.Activos
+                .CountAsync(EstadosReporte.EsFuncional);
 
-            int totalDanados = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "Dañado");
+            int totalDanados = await _context.Activos
+                .CountAsync(EstadosReporte.EsDanado);
 
-            int totalMantenimiento = await _context.Activos.CountAsync(a =>
-                a.EstadoActivo != null &&
-                a.EstadoActivo.Estado == "En mantenimiento");
+            int totalMantenimiento = await _context.Activos
+                .CountAsync(EstadosReporte.EsEnMantenimiento);
 
             int totalUbicacionesConActivos = await _context.Activos
                 .Select(a => a.IdUbicacion)
@@ -204,7 +207,8 @@ namespace InventarioEscuela.Controllers
         {
             ViewData["ReturnUrl"] =
                 !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
-                    ? returnUrl : null;
+                    ? returnUrl
+                    : null;
 
             var activo = await _context.Activos
                 .AsNoTracking()
@@ -288,6 +292,7 @@ namespace InventarioEscuela.Controllers
 
                 _context.Activos.Add(nuevoActivo);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -299,6 +304,7 @@ namespace InventarioEscuela.Controllers
                 _context.ChangeTracker.Clear();
                 AgregarErrorGuardadoActivo(ex);
                 await CargarListas(activo);
+
                 return View(activo);
             }
         }
@@ -311,7 +317,8 @@ namespace InventarioEscuela.Controllers
         {
             var retorno =
                 !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
-                    ? returnUrl : null;
+                    ? returnUrl
+                    : null;
 
             ViewData["ReturnUrl"] = retorno;
 
@@ -376,7 +383,8 @@ namespace InventarioEscuela.Controllers
         {
             var retorno =
                 !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
-                    ? returnUrl : null;
+                    ? returnUrl
+                    : null;
 
             ViewData["ReturnUrl"] = retorno;
 

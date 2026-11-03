@@ -18,84 +18,54 @@
 }
 
 <div class="dashboard-page">
-
-    <h2 class="dashboard-section-title">
-        Inventario institucional
-    </h2>
+    <h2 class="dashboard-section-title">Inventario institucional</h2>
 
     <div class="dashboard-resumen">
-
         <div class="dashboard-card">
             <div class="dashboard-card-icon">📦</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @Model.TotalActivos
-                </div>
-                <div class="dashboard-card-title">
-                    Total activos registrados
-                </div>
+                <div class="dashboard-card-number">@Model.TotalActivos</div>
+                <div class="dashboard-card-title">Total activos registrados</div>
             </div>
         </div>
 
         <div class="dashboard-card">
             <div class="dashboard-card-icon">✅</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @Model.TotalFuncionales
-                </div>
-                <div class="dashboard-card-title">
-                    Equipos funcionales
-                </div>
+                <div class="dashboard-card-number">@Model.TotalFuncionales</div>
+                <div class="dashboard-card-title">Equipos funcionales</div>
             </div>
         </div>
 
         <div class="dashboard-card">
             <div class="dashboard-card-icon dashboard-danger-icon">⚠️</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @Model.TotalDanados
-                </div>
-                <div class="dashboard-card-title">
-                    Equipos dañados
-                </div>
+                <div class="dashboard-card-number">@Model.TotalDanados</div>
+                <div class="dashboard-card-title">Equipos dañados</div>
             </div>
         </div>
 
         <div class="dashboard-card">
             <div class="dashboard-card-icon">🛠️</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @Model.TotalMantenimiento
-                </div>
-                <div class="dashboard-card-title">
-                    En mantenimiento
-                </div>
+                <div class="dashboard-card-number">@Model.TotalMantenimiento</div>
+                <div class="dashboard-card-title">En mantenimiento</div>
             </div>
         </div>
 
         <div class="dashboard-card">
             <div class="dashboard-card-icon">📍</div>
             <div class="dashboard-card-content">
-                <div class="dashboard-card-number">
-                    @Model.TotalUbicacionesConActivos
-                </div>
-                <div class="dashboard-card-title">
-                    Ubicaciones con activos
-                </div>
+                <div class="dashboard-card-number">@Model.TotalUbicacionesConActivos</div>
+                <div class="dashboard-card-title">Ubicaciones con activos</div>
             </div>
         </div>
-
     </div>
 
-    <h2 class="dashboard-section-title">
-        Inventario
-    </h2>
+    <h2 class="dashboard-section-title">Inventario</h2>
 
     <div class="filtros-container">
-
-        <div class="filtros-titulo">
-            Filtros
-        </div>
+        <div class="filtros-titulo">Filtros</div>
 
         <form asp-controller="Inventario"
               asp-action="Index"
@@ -239,9 +209,7 @@
                style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
                 Limpiar filtros
             </a>
-
         </form>
-
     </div>
 
     <div style="margin-bottom:8px;font-size:11px;color:#666;">
@@ -262,10 +230,12 @@
         activos.
     </div>
 
-    <div class="dashboard-table-container">
+    <div class="dashboard-table-container"
+         role="region"
+         aria-label="Inventario de activos"
+         tabindex="0">
 
         <table class="tabla-base dashboard-table">
-
             <thead>
                 <tr>
                     <th>Código</th>
@@ -303,21 +273,10 @@
                                     : activo.Serie)
                             </td>
 
-                            <td>
-                                @(activo.Ubicacion?.UbicacionNombre ?? "N/I")
-                            </td>
-
-                            <td>
-                                @(activo.EstadoActivo?.Estado ?? "N/I")
-                            </td>
-
-                            <td>
-                                @(activo.ModoAdquisicion?.NombreModoAdquisicion ?? "N/I")
-                            </td>
-
-                            <td>
-                                @activo.FechaRegistro.ToString("dd/MM/yyyy")
-                            </td>
+                            <td>@(activo.Ubicacion?.UbicacionNombre ?? "N/I")</td>
+                            <td>@(activo.EstadoActivo?.Estado ?? "N/I")</td>
+                            <td>@(activo.ModoAdquisicion?.NombreModoAdquisicion ?? "N/I")</td>
+                            <td>@(activo.FechaRegistro.ToString("dd/MM/yyyy"))</td>
 
                             <td class="acciones">
                                 <a asp-controller="Inventario"
@@ -327,8 +286,7 @@
                                     Ver
                                 </a>
 
-                                @if (User.IsInRole("Administrador") ||
-                                     User.IsInRole("Secretario"))
+                                @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
                                 {
                                     <a asp-controller="Inventario"
                                        asp-action="Edit"
@@ -350,15 +308,12 @@
                     </tr>
                 }
             </tbody>
-
         </table>
-
     </div>
 
     @if (Model.TotalPaginas > 1)
     {
         <div class="dashboard-pagination">
-
             @if (Model.PaginaActual > 1)
             {
                 <a asp-controller="Inventario"
@@ -404,9 +359,7 @@
             {
                 if (i == Model.PaginaActual)
                 {
-                    <span class="dashboard-page-number active">
-                        @i
-                    </span>
+                    <span class="dashboard-page-number active">@i</span>
                 }
                 else
                 {
@@ -470,7 +423,6 @@
                     »
                 </a>
             }
-
         </div>
 
         <div style="text-align:right;margin-top:5px;font-size:10px;color:#777;">
@@ -486,9 +438,7 @@
     </h2>
 
     <div class="dashboard-actions">
-
-        @if (User.IsInRole("Administrador") ||
-             User.IsInRole("Secretario"))
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
         {
             <a asp-controller="Inventario"
                asp-action="Create"
@@ -497,8 +447,7 @@
             </a>
         }
 
-        @if (User.IsInRole("Administrador") ||
-             User.IsInRole("Secretario"))
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
         {
             <a asp-controller="Movimientos"
                asp-action="Create"
@@ -507,8 +456,7 @@
             </a>
         }
 
-        @if (User.IsInRole("Administrador") ||
-             User.IsInRole("Secretario"))
+        @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
         {
             <a asp-controller="Mantenimiento"
                asp-action="Create"
@@ -522,7 +470,5 @@
            class="dashboard-action">
             Volver al panel principal
         </a>
-
     </div>
-
 </div>
