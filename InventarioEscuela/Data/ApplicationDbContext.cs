@@ -57,6 +57,11 @@ namespace InventarioEscuela.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Correo)
                 .IsUnique();
+
+            //Esta es uan prueba
+
+
+
         }
     }
 }
