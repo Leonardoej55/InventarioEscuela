@@ -1,508 +1,68 @@
 ﻿@model InventarioEscuela.ViewModels.ReporteEquiposDanadosViewModel
-
 @{
-    ViewData["Title"] = "Vista previa - Equipos dañados";
-
-    // =========================================
-    // VENTANA DE PÁGINAS
-    // =========================================
-    int paginasVisibles = 5;
-
-    int paginaInicio =
-        Math.Max(
-            1,
-            Model.PaginaActual - 2);
-
-    int paginaFin =
-        Math.Min(
-            Model.TotalPaginas,
-            paginaInicio + paginasVisibles - 1);
-
-    if (paginaFin - paginaInicio + 1 < paginasVisibles)
-    {
-        paginaInicio =
-            Math.Max(
-                1,
-                paginaFin - paginasVisibles + 1);
-    }
+    ViewData["Title"] = "Activos dañados · Resultados";
+    ViewData["AccionReporte"] = "EquiposDanados";
+    int desde = Model.TotalResultados == 0 ? 0 : (Model.PaginaActual - 1) * Model.TamanoPagina + 1;
+    int hasta = Math.Min(Model.PaginaActual * Model.TamanoPagina, Model.TotalResultados);
 }
-
-
-<div class="dashboard-page">
-
-
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
-    <h2 class="dashboard-section-title">
-        Vista previa - Equipos dañados
-    </h2>
-
-
-    <div style="
-        margin-bottom:15px;
-        font-size:11px;
-        color:#666;">
-
-        Revise la información antes de generar
-        el documento PDF.
-
-    </div>
-
-
-    <!-- =========================================
-         RESUMEN
-         ========================================= -->
-    <div class="dashboard-resumen">
-
-
-        <!-- TOTAL DAÑADOS -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon dashboard-danger-icon">
-                ⚠️
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalResultados
-                </div>
-
-                <div class="dashboard-card-title">
-                    Equipos dañados
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- UBICACIONES -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                📍
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalUbicaciones
-                </div>
-
-                <div class="dashboard-card-title">
-                    Ubicaciones afectadas
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- MARCAS -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                🏷️
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalMarcas
-                </div>
-
-                <div class="dashboard-card-title">
-                    Marcas diferentes
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- OBSERVACIONES -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                📝
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalConObservacion
-                </div>
-
-                <div class="dashboard-card-title">
-                    Con observación
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================
-         INFORMACIÓN DE RESULTADOS
-         ========================================= -->
-    <div style="
-        margin-top:10px;
-        margin-bottom:8px;
-        font-size:11px;
-        color:#666;">
-
-        Mostrando
-
-        <strong>
-            @(
-                Model.TotalResultados == 0
-                ? 0
-                : ((Model.PaginaActual - 1)
-                    * Model.TamanoPagina) + 1
-            )
-        </strong>
-
-        -
-
-        <strong>
-            @Math.Min(
-                Model.PaginaActual *
-                Model.TamanoPagina,
-                Model.TotalResultados)
-        </strong>
-
-        de
-
-        <strong>
-            @Model.TotalResultados
-        </strong>
-
-        equipos dañados.
-
-    </div>
-
-
-    <!-- =========================================
-         TABLA
-         ========================================= -->
-    <div class="dashboard-table-container">
-
-        <table class="tabla-base dashboard-table">
-
+<div class="rpt-page">
+    <a asp-controller="Reportes" asp-action="Index" class="rpt-back">← Todos los reportes</a>
+    <header class="rpt-header">
+        <h2>Activos dañados</h2>
+        <p>Consulte los resultados y descargue el reporte completo cuando lo necesite.</p>
+    </header>
+    <partial name="_ErroresReporte" />
+    <partial name="_FiltrosAplicados" model="Model" />
+    <dl class="rpt-totals">
+        <div><dt>Activos dañados</dt><dd>@Model.TotalResultados</dd></div>
+        <div><dt>Ubicaciones afectadas</dt><dd>@Model.TotalUbicaciones</dd></div>
+        <div><dt>Con observación</dt><dd>@Model.TotalConObservacion</dd></div>
+    </dl>
+    <partial name="_AccionesReporte" model="Model" />
+    <h3>Detalle de resultados</h3>
+    <p class="rpt-result-count">Mostrando <strong>@desde–@hasta</strong> de <strong>@Model.TotalResultados</strong> registros. Los totales y las descargas corresponden a todos los resultados.</p>
+    <p class="rpt-table-hint">Deslice la tabla hacia los lados para consultar todas las columnas.</p>
+    <div class="dashboard-table-container rpt-table-wrap" role="region" aria-label="Detalle del reporte" tabindex="0">
+        <table class="tabla-base dashboard-table rpt-table">
+            <caption>Activos dañados: resultados de la página actual.</caption>
             <thead>
-
                 <tr>
-
-                    <th>
-                        Código
-                    </th>
-
-                    <th>
-                        Descripción
-                    </th>
-
-                    <th>
-                        Marca
-                    </th>
-
-                    <th>
-                        Modelo
-                    </th>
-
-                    <th>
-                        Serie
-                    </th>
-
-                    <th>
-                        Ubicación
-                    </th>
-
-                    <th>
-                        Estado
-                    </th>
-
-                    <th>
-                        Observación
-                    </th>
-
+                    <th scope="col">Código</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Marca</th>
+                    <th scope="col">Modelo</th>
+                    <th scope="col">Serie</th>
+                    <th scope="col">Ubicación</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Observación</th>
+                    <th scope="col">Consultar o actualizar</th>
                 </tr>
-
             </thead>
-
-
             <tbody>
-
                 @if (Model.Activos.Any())
                 {
-                    foreach (var activo
-                        in Model.Activos)
+                    foreach (var activo in Model.Activos)
                     {
                         <tr>
-
-                            <td>
-                                @activo.NumeroIdentificacion
-                            </td>
-
-                            <td>
-                                @activo.Descripcion
-                            </td>
-
-                            <td>
-                                @(activo.Marca?.MarcaNombre
-                                    ?? "N/I")
-                            </td>
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    activo.Modelo)
-                                    ? "N/I"
-                                    : activo.Modelo)
-                            </td>
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    activo.Serie)
-                                    ? "N/I"
-                                    : activo.Serie)
-                            </td>
-
-                            <td>
-                                @(activo.Ubicacion?
-                                    .UbicacionNombre
-                                    ?? "N/I")
-                            </td>
-
-                            <td>
-                                @(activo.EstadoActivo?
-                                    .Estado
-                                    ?? "N/I")
-                            </td>
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    activo.Observacion)
-                                    ? "Sin observación"
-                                    : activo.Observacion)
-                            </td>
-
+                            <td>@activo.NumeroIdentificacion</td>
+                            <td>@activo.Descripcion</td>
+                            <td>@(activo.Marca?.MarcaNombre ?? "No informado")</td>
+                            <td>@(string.IsNullOrWhiteSpace(activo.Modelo) ? "No informado" : activo.Modelo)</td>
+                            <td>@(string.IsNullOrWhiteSpace(activo.Serie) ? "No informado" : activo.Serie)</td>
+                            <td>@(activo.Ubicacion?.UbicacionNombre ?? "Sin ubicación")</td>
+                            <td>@(activo.EstadoActivo?.Estado ?? "No informado")</td>
+                            <td>@(string.IsNullOrWhiteSpace(activo.Observacion) ? "Sin observación" : activo.Observacion)</td>
+                            <td><partial name="_AccionesActivo" model="activo" /></td>
                         </tr>
                     }
                 }
                 else
                 {
-                    <tr>
-
-                        <td colspan="8"
-                            style="
-                            text-align:center;
-                            padding:14px;">
-
-                            No se encontraron equipos dañados
-                            con los filtros seleccionados.
-
-                        </td>
-
-                    </tr>
+                    <tr><td colspan="9" class="rpt-empty">No se encontraron resultados con estos filtros. Puede modificarlos o limpiarlos para ampliar la consulta.</td></tr>
                 }
-
             </tbody>
-
         </table>
-
     </div>
-
-
-    <!-- =========================================
-         PAGINACIÓN
-         ========================================= -->
-    @if (Model.TotalPaginas > 1)
-    {
-        <div class="dashboard-pagination">
-
-
-            <!-- PRIMERA / ANTERIOR -->
-            @if (Model.PaginaActual > 1)
-            {
-                <a asp-controller="Reportes"
-                   asp-action="EquiposDanadosPreview"
-                   asp-route-pagina="1"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idModoFiltro="@Model.IdModoFiltro"
-                   class="dashboard-page-arrow"
-                   title="Primera página">
-
-                    «
-
-                </a>
-
-
-                <a asp-controller="Reportes"
-                   asp-action="EquiposDanadosPreview"
-                   asp-route-pagina="@(Model.PaginaActual - 1)"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idModoFiltro="@Model.IdModoFiltro"
-                   class="dashboard-page-arrow"
-                   title="Página anterior">
-
-                    ‹
-
-                </a>
-            }
-
-
-            <!-- NÚMEROS -->
-            @for (int i = paginaInicio;
-                  i <= paginaFin;
-                  i++)
-            {
-                if (i == Model.PaginaActual)
-                {
-                    <span class="dashboard-page-number active">
-
-                        @i
-
-                    </span>
-                }
-                else
-                {
-                    <a asp-controller="Reportes"
-                       asp-action="EquiposDanadosPreview"
-                       asp-route-pagina="@i"
-                       asp-route-codigoFiltro="@Model.CodigoFiltro"
-                       asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                       asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                       asp-route-modeloFiltro="@Model.ModeloFiltro"
-                       asp-route-serieFiltro="@Model.SerieFiltro"
-                       asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                       asp-route-idModoFiltro="@Model.IdModoFiltro"
-                       class="dashboard-page-number">
-
-                        @i
-
-                    </a>
-                }
-            }
-
-
-            <!-- SIGUIENTE / ÚLTIMA -->
-            @if (Model.PaginaActual <
-                Model.TotalPaginas)
-            {
-                <a asp-controller="Reportes"
-                   asp-action="EquiposDanadosPreview"
-                   asp-route-pagina="@(Model.PaginaActual + 1)"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idModoFiltro="@Model.IdModoFiltro"
-                   class="dashboard-page-arrow"
-                   title="Página siguiente">
-
-                    ›
-
-                </a>
-
-
-                <a asp-controller="Reportes"
-                   asp-action="EquiposDanadosPreview"
-                   asp-route-pagina="@Model.TotalPaginas"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idModoFiltro="@Model.IdModoFiltro"
-                   class="dashboard-page-arrow"
-                   title="Última página">
-
-                    »
-
-                </a>
-            }
-
-        </div>
-
-
-        <!-- INFORMACIÓN PÁGINA -->
-        <div style="
-            text-align:right;
-            margin-top:5px;
-            font-size:10px;
-            color:#777;">
-
-            Página
-
-            <strong>
-                @Model.PaginaActual
-            </strong>
-
-            de
-
-            <strong>
-                @Model.TotalPaginas
-            </strong>
-
-        </div>
-    }
-
-
-    <!-- =========================================
-         BOTONES
-         ========================================= -->
-    <div class="registro-botones">
-
-        <a asp-controller="Reportes"
-           asp-action="EquiposDanados"
-           asp-route-codigoFiltro="@Model.CodigoFiltro"
-           asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-           asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-           asp-route-modeloFiltro="@Model.ModeloFiltro"
-           asp-route-serieFiltro="@Model.SerieFiltro"
-           asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-           asp-route-idModoFiltro="@Model.IdModoFiltro"
-           class="btn-accion">
-
-            Modificar filtros
-
-        </a>
-
-
-        @if (Model.TotalResultados > 0)
-        {
-            <a asp-controller="Reportes"
-               asp-action="GenerarEquiposDanadosPdf"
-               asp-route-codigoFiltro="@Model.CodigoFiltro"
-               asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-               asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-               asp-route-modeloFiltro="@Model.ModeloFiltro"
-               asp-route-serieFiltro="@Model.SerieFiltro"
-               asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-               asp-route-idModoFiltro="@Model.IdModoFiltro"
-               class="btn-registrar">
-
-                Generar PDF
-
-            </a>
-        }
-
-    </div>
-
+    <partial name="_Paginacion" model="Model" />
+    <p class="rpt-help">Use «Ver activo» para consultar sus datos. Administradores y secretarios pueden corregir estado u observaciones con «Editar». Para cambiar la ubicación, use «trasladar» y conserve el historial del activo.</p>
 </div>

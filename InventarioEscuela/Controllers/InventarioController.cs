@@ -362,8 +362,10 @@ namespace InventarioEscuela.Controllers
         // =========================================
         [HttpGet]
         public async Task<IActionResult> Details(
-            int id)
+            int id, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
+                ? returnUrl : null;
             var activo =
                 await _context.Activos
                     .AsNoTracking()
@@ -465,8 +467,10 @@ namespace InventarioEscuela.Controllers
         // =========================================
         [HttpGet]
         [Authorize(Roles = "Administrador,Secretario")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string? returnUrl = null)
         {
+            var retorno = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl) ? returnUrl : null;
+            ViewData["ReturnUrl"] = retorno;
             try
             {
                 var activo = await _context.Activos
@@ -506,7 +510,7 @@ namespace InventarioEscuela.Controllers
                 {
                     Titulo = "No se pudo cargar el activo",
                     Mensaje = "No se pudo consultar la información en este momento. Intente cargarla nuevamente.",
-                    UrlReintento = Url.Action(nameof(Edit), "Inventario", new { id }) ?? string.Empty
+                    UrlReintento = Url.Action(nameof(Edit), "Inventario", new { id, returnUrl = retorno }) ?? string.Empty
                 });
             }
         }
@@ -514,8 +518,10 @@ namespace InventarioEscuela.Controllers
         [HttpPost]
         [Authorize(Roles = "Administrador,Secretario")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ActivoEditViewModel model)
+        public async Task<IActionResult> Edit(int id, ActivoEditViewModel model, string? returnUrl = null)
         {
+            var retorno = !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl) ? returnUrl : null;
+            ViewData["ReturnUrl"] = retorno;
             if (id != model.IdActivo)
             {
                 return NotFound();
@@ -564,6 +570,8 @@ namespace InventarioEscuela.Controllers
 
                 // La ubicación y la fecha de registro nunca se cambian desde la edición.
                 await _context.SaveChangesAsync();
+                if (!string.IsNullOrEmpty(retorno) && Url.IsLocalUrl(retorno))
+                    return LocalRedirect(retorno);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex) when (ErroresBaseDeDatos.EsErrorDeBaseDeDatos(ex))

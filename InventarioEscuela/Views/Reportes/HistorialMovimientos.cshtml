@@ -1,319 +1,79 @@
 ﻿@model InventarioEscuela.ViewModels.ReporteHistorialMovimientosViewModel
-
 @{
     ViewData["Title"] = "Historial de movimientos";
+    bool avanzados = !ViewData.ModelState.IsValid || !string.IsNullOrWhiteSpace(Model.DescripcionFiltro) || Model.IdUbicacionOrigenFiltro.HasValue || Model.IdUbicacionDestinoFiltro.HasValue || !string.IsNullOrWhiteSpace(Model.ResponsableFiltro) || !string.IsNullOrWhiteSpace(Model.ObservacionFiltro);
 }
-
-<div class="registro-activo-container">
-
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
-    <h2 class="titulo-inventario">
-        Reporte de historial de movimientos
-    </h2>
-
-
-    <p style="
-        margin-top:-5px;
-        margin-bottom:20px;
-        color:#666;
-        font-size:12px;">
-
-        Configure los filtros que desea aplicar.
-        El reporte incluirá los movimientos de activos
-        registrados en el sistema.
-
-    </p>
-
-
-    @if (TempData["ErrorReporte"] != null)
-    {
-        <div class="text-danger"
-             style="margin-bottom:15px;">
-
-            @TempData["ErrorReporte"]
-
-        </div>
-    }
-
-
-    <form asp-controller="Reportes"
-          asp-action="HistorialMovimientosPreview"
-          method="get">
-
-
-        <!-- =========================================
-             ACTIVO
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información del activo
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- CÓDIGO -->
-                <div class="registro-campo">
-
-                    <label>
-                        Código
-                    </label>
-
-                    <input type="text"
-                           name="codigoFiltro"
-                           value="@Model.CodigoFiltro"
-                           class="registro-input"
-                           placeholder="Número de identificación" />
-
-                </div>
-
-
-                <!-- DESCRIPCIÓN -->
-                <div class="registro-campo">
-
-                    <label>
-                        Descripción
-                    </label>
-
-                    <input type="text"
-                           name="descripcionFiltro"
-                           value="@Model.DescripcionFiltro"
-                           class="registro-input"
-                           placeholder="Descripción del activo" />
-
-                </div>
-
+<div class="rpt-page">
+    <a asp-controller="Reportes" asp-action="Index" class="rpt-back">← Todos los reportes</a>
+    <header class="rpt-header">
+        <h2>Historial de movimientos</h2>
+        <p>Consulte los traslados registrados en un período o busque el recorrido de un activo. Todos los filtros son opcionales.</p>
+    </header>
+    <partial name="_ErroresReporte" />
+    <form asp-controller="Reportes" asp-action="HistorialMovimientosPreview" method="get" class="rpt-form">
+        <div class="rpt-fields">
+            <div class="rpt-field">
+                <label for="codigoFiltro">Código</label>
+                <input asp-for="CodigoFiltro" name="codigoFiltro" id="codigoFiltro" type="text" />
+                <span asp-validation-for="CodigoFiltro" class="rpt-field-error"></span>
             </div>
-
+            <div class="rpt-field">
+                <label for="fechaDesde">Fecha de movimiento desde</label>
+                <input asp-for="FechaDesde" name="fechaDesde" id="fechaDesde" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span asp-validation-for="FechaDesde" class="rpt-field-error"></span>
+            </div>
+            <div class="rpt-field">
+                <label for="fechaHasta">Fecha de movimiento hasta, inclusive</label>
+                <input asp-for="FechaHasta" name="fechaHasta" id="fechaHasta" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span asp-validation-for="FechaHasta" class="rpt-field-error"></span>
+            </div>
         </div>
-
-
-        <!-- =========================================
-             UBICACIONES
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Ubicaciones
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- ORIGEN -->
-                <div class="registro-campo">
-
-                    <label>
-                        Ubicación origen
-                    </label>
-
-                    <select name="idUbicacionOrigenFiltro"
-                            class="registro-input">
-
-                        <option value="">
-                            Todas las ubicaciones
-                        </option>
-
-
-                        @foreach (var ubicacion
-                            in Model.Ubicaciones)
+        <details class="rpt-advanced" open="@(avanzados ? "open" : null)">
+            <summary>Más filtros (opcionales)</summary>
+            <div class="rpt-fields">
+                <div class="rpt-field">
+                    <label for="descripcionFiltro">Descripción del activo</label>
+                    <input asp-for="DescripcionFiltro" name="descripcionFiltro" id="descripcionFiltro" type="text" />
+                    <span asp-validation-for="DescripcionFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="idUbicacionOrigenFiltro">Ubicación de origen</label>
+                    <select asp-for="IdUbicacionOrigenFiltro" name="idUbicacionOrigenFiltro" id="idUbicacionOrigenFiltro">
+                        <option value="">Todos los orígenes</option>
+                        @foreach (var opcion in Model.Ubicaciones)
                         {
-                            if (Model.IdUbicacionOrigenFiltro ==
-                                ubicacion.IdUbicacion)
-                            {
-                                <option value="@ubicacion.IdUbicacion"
-                                        selected>
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@ubicacion.IdUbicacion">
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
+                            <option value="@opcion.IdUbicacion">@opcion.UbicacionNombre</option>
                         }
-
                     </select>
-
+                    <span asp-validation-for="IdUbicacionOrigenFiltro" class="rpt-field-error"></span>
                 </div>
-
-
-                <!-- DESTINO -->
-                <div class="registro-campo">
-
-                    <label>
-                        Ubicación destino
-                    </label>
-
-                    <select name="idUbicacionDestinoFiltro"
-                            class="registro-input">
-
-                        <option value="">
-                            Todas las ubicaciones
-                        </option>
-
-
-                        @foreach (var ubicacion
-                            in Model.Ubicaciones)
+                <div class="rpt-field">
+                    <label for="idUbicacionDestinoFiltro">Ubicación de destino</label>
+                    <select asp-for="IdUbicacionDestinoFiltro" name="idUbicacionDestinoFiltro" id="idUbicacionDestinoFiltro">
+                        <option value="">Todos los destinos</option>
+                        @foreach (var opcion in Model.Ubicaciones)
                         {
-                            if (Model.IdUbicacionDestinoFiltro ==
-                                ubicacion.IdUbicacion)
-                            {
-                                <option value="@ubicacion.IdUbicacion"
-                                        selected>
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@ubicacion.IdUbicacion">
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
+                            <option value="@opcion.IdUbicacion">@opcion.UbicacionNombre</option>
                         }
-
                     </select>
-
+                    <span asp-validation-for="IdUbicacionDestinoFiltro" class="rpt-field-error"></span>
                 </div>
-
+                <div class="rpt-field">
+                    <label for="responsableFiltro">Responsable</label>
+                    <input asp-for="ResponsableFiltro" name="responsableFiltro" id="responsableFiltro" type="text" />
+                    <span asp-validation-for="ResponsableFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="observacionFiltro">Texto de la observación</label>
+                    <input asp-for="ObservacionFiltro" name="observacionFiltro" id="observacionFiltro" type="text" />
+                    <span asp-validation-for="ObservacionFiltro" class="rpt-field-error"></span>
+                </div>
             </div>
-
+        </details>
+        <p class="rpt-help">Las fechas corresponden al traslado. Si deja el período vacío se consulta todo el historial.</p>
+        <div class="rpt-actions">
+            <button type="submit" class="rpt-button">Consultar resultados</button>
+            <a asp-controller="Reportes" asp-action="HistorialMovimientos" class="rpt-button rpt-button-secondary">Limpiar filtros</a>
         </div>
-
-
-        <!-- =========================================
-             DATOS DEL MOVIMIENTO
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información del movimiento
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- RESPONSABLE -->
-                <div class="registro-campo">
-
-                    <label>
-                        Responsable
-                    </label>
-
-                    <input type="text"
-                           name="responsableFiltro"
-                           value="@Model.ResponsableFiltro"
-                           class="registro-input"
-                           placeholder="Responsable" />
-
-                </div>
-
-
-                <!-- OBSERVACIÓN -->
-                <div class="registro-campo">
-
-                    <label>
-                        Observación
-                    </label>
-
-                    <input type="text"
-                           name="observacionFiltro"
-                           value="@Model.ObservacionFiltro"
-                           class="registro-input"
-                           placeholder="Texto de la observación" />
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================================
-             RANGO DE FECHAS
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Rango de fechas
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- DESDE -->
-                <div class="registro-campo">
-
-                    <label>
-                        Desde
-                    </label>
-
-                    <input type="date"
-                           name="fechaDesde"
-                           value="@(Model.FechaDesde?.ToString("yyyy-MM-dd"))"
-                           class="registro-input" />
-
-                </div>
-
-
-                <!-- HASTA -->
-                <div class="registro-campo">
-
-                    <label>
-                        Hasta
-                    </label>
-
-                    <input type="date"
-                           name="fechaHasta"
-                           value="@(Model.FechaHasta?.ToString("yyyy-MM-dd"))"
-                           class="registro-input" />
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================================
-             BOTONES
-             ========================================= -->
-        <div class="registro-botones">
-
-            <a asp-controller="Reportes"
-               asp-action="Index"
-               class="btn-accion">
-
-                Volver a reportes
-
-            </a>
-
-
-            <button type="submit"
-                    class="btn-registrar">
-
-                Vista previa
-
-            </button>
-
-        </div>
-
     </form>
-
 </div>

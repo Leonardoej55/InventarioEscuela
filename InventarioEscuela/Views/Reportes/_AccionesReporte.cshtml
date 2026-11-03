@@ -1,0 +1,30 @@
+﻿@model InventarioEscuela.ViewModels.ReporteBaseViewModel
+@{
+    var reporte = ViewData["AccionReporte"]?.ToString() ?? "InventarioGeneral";
+    var pdf = "Generar" + reporte + "Pdf";
+    var csv = "Generar" + reporte + "Csv";
+    var rutas = InventarioEscuela.ViewModels.RutasReporte.Crear(Model);
+    bool verificacion = reporte == "RecursosPorUbicacion";
+}
+<div class="rpt-actions" aria-label="Acciones del reporte">
+    <a asp-controller="Reportes" asp-action="@reporte" asp-all-route-data="@rutas" class="rpt-button rpt-button-secondary">Modificar filtros</a>
+    @if (Model.TotalResultados > 0)
+    {
+        @if (verificacion)
+        {
+            <a asp-controller="Reportes" asp-action="GenerarVerificacionAnualPdf" asp-all-route-data="@rutas" class="rpt-button">Hoja de verificación anual</a>
+        }
+        <a asp-controller="Reportes" asp-action="@pdf" asp-all-route-data="@rutas" class="rpt-button @(verificacion ? "rpt-button-secondary" : "")">Descargar PDF · @Model.TotalResultados registros</a>
+        <a asp-controller="Reportes" asp-action="@csv" asp-all-route-data="@rutas" class="rpt-button rpt-button-secondary">Descargar CSV para Excel</a>
+    }
+    else
+    {
+        @if (verificacion)
+        {
+            <button class="rpt-button" type="button" disabled>Hoja de verificación anual</button>
+        }
+        <button class="rpt-button rpt-button-secondary" type="button" disabled>Descargar PDF</button>
+        <button class="rpt-button rpt-button-secondary" type="button" disabled>Descargar CSV para Excel</button>
+    }
+</div>
+<p class="rpt-help">Las descargas incluyen todos los resultados filtrados, no solo esta página. Si hay muchos registros, pueden tardar unos momentos.</p>

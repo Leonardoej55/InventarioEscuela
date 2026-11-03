@@ -1,0 +1,18 @@
+﻿@model InventarioEscuela.ViewModels.ReporteBaseViewModel
+<section class="rpt-filter-summary" aria-label="Filtros y alcance del reporte">
+    <h3>Filtros aplicados</h3>
+    @if (Model.FiltrosAplicados.Count > 0)
+    {
+        <ul class="rpt-filter-list">
+            @foreach (var filtro in Model.FiltrosAplicados)
+            {
+                <li>@filtro</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Sin filtros adicionales.</p>
+    }
+    <p class="rpt-help">@Model.Alcance</p>
+</section>

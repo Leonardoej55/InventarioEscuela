@@ -1,0 +1,494 @@
+﻿/* Reportes: lectura y controles independientes del resto del sistema. */
+.rpt-page {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: #1f2937;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+    .rpt-page h2 {
+        margin: 12px 0 8px;
+        color: #173b7a;
+        font-size: 26px;
+        line-height: 1.25;
+    }
+
+    .rpt-page h3 {
+        margin: 18px 0 10px;
+        color: #173b7a;
+        font-size: 19px;
+        line-height: 1.35;
+    }
+
+    .rpt-page p {
+        margin: 8px 0 14px;
+    }
+
+    .rpt-page .rpt-back {
+        display: inline-block;
+        padding: 8px 0;
+        color: #173b7a;
+    }
+
+.rpt-header {
+    margin-bottom: 22px;
+}
+
+.rpt-page .rpt-help {
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.rpt-page .rpt-callout {
+    padding: 13px 16px;
+    border-left: 4px solid #316ac5;
+    background: #eef4fc;
+}
+
+.rpt-annual, .rpt-form, .rpt-filter-summary {
+    margin: 16px 0;
+    padding: 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.rpt-annual {
+    background: #eef4fc;
+    border-color: #aec5e7;
+}
+
+    .rpt-annual h3, .rpt-filter-summary h3 {
+        margin-top: 0;
+    }
+
+.rpt-steps {
+    margin: 12px 0 20px;
+    padding-left: 24px;
+}
+
+    .rpt-steps li {
+        margin-bottom: 8px;
+    }
+/* El índice reutiliza las tarjetas y botones del diseño general de la aplicación. */
+.rpt-index .reportes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rpt-index .reporte-boton {
+    min-height: 44px;
+}
+
+.rpt-index a:focus-visible, .rpt-index summary:focus-visible {
+    outline: 3px solid var(--color-primary-light);
+    outline-offset: 3px;
+}
+
+.rpt-annual-badge {
+    align-self: flex-start;
+    margin: 0 0 8px;
+    padding: 3px 8px;
+    border-radius: var(--radius-small);
+    background: #edf2fa;
+    color: var(--color-primary);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.rpt-annual-guide {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-large);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.rpt-annual-guide-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    justify-content: space-between;
+}
+
+    .rpt-annual-guide-header h3 {
+        margin: 0 0 6px;
+        color: var(--color-primary);
+        font-size: 15px;
+    }
+
+.rpt-annual-guide p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.rpt-annual-guide .reporte-boton {
+    flex-shrink: 0;
+}
+
+.rpt-annual-guide details {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.rpt-annual-guide summary {
+    width: fit-content;
+    min-height: 44px;
+    padding: 12px 0;
+    color: var(--color-primary);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.rpt-annual-guide .rpt-steps {
+    margin-top: 6px;
+}
+
+.rpt-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.rpt-field {
+    min-width: 0;
+}
+
+    .rpt-field label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .rpt-field input, .rpt-field select {
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 11px;
+        border: 1px solid #64748b;
+        border-radius: 6px;
+        background: #fff;
+        color: #111827;
+        font: inherit;
+    }
+
+.rpt-advanced {
+    margin: 22px 0 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+    .rpt-advanced summary {
+        padding: 12px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #173b7a;
+    }
+
+    .rpt-advanced .rpt-fields {
+        padding: 4px 14px 16px;
+    }
+
+.rpt-field-error {
+    color: #b91c1c;
+    font-size: 13px;
+}
+
+.rpt-field .input-validation-error {
+    border: 2px solid #b91c1c;
+}
+
+.rpt-alert {
+    padding: 14px 18px;
+    margin: 14px 0;
+    border: 1px solid #b91c1c;
+    border-radius: 6px;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+    .rpt-alert ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+.rpt-filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 12px;
+    padding: 0;
+    list-style: none;
+}
+
+    .rpt-filter-list li {
+        padding: 5px 10px;
+        border-radius: 5px;
+        background: #eef2f7;
+        overflow-wrap: anywhere;
+    }
+
+.rpt-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+}
+
+    .rpt-totals div {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    .rpt-totals dt {
+        font-size: 14px;
+    }
+
+    .rpt-totals dd {
+        order: -1;
+        margin: 0;
+        color: #173b7a;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+.rpt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 10px;
+}
+
+.rpt-page .rpt-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid #173b7a;
+    border-radius: 6px;
+    background: #173b7a;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.rpt-page .rpt-button-secondary {
+    color: #173b7a;
+    background: #fff;
+}
+
+.rpt-page .rpt-button:hover {
+    background: #0f2d60;
+    color: #fff;
+}
+
+.rpt-page .rpt-button:disabled {
+    opacity: .6;
+    cursor: default;
+    background: #e5e7eb;
+    color: #374151;
+    border-color: #9ca3af;
+}
+
+.rpt-page a:focus-visible, .rpt-page button:focus-visible, .rpt-page input:focus-visible,
+.rpt-page select:focus-visible, .rpt-page summary:focus-visible, .rpt-table-wrap:focus-visible {
+    outline: 3px solid #316ac5;
+    outline-offset: 3px;
+}
+
+.rpt-table-hint {
+    display: none;
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.rpt-table {
+    min-width: 1050px;
+}
+
+    .rpt-table caption {
+        padding: 10px 12px;
+        color: #4b5563;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .rpt-table th, .rpt-table td {
+        overflow-wrap: anywhere;
+    }
+    /* Los encabezados de fila del resumen conservan su semántica y el aspecto de una celda de datos. */
+    .rpt-table tbody th[scope="row"] {
+        height: 40px;
+        background: var(--color-surface);
+        text-align: left;
+        font-weight: normal;
+        line-height: 1.25;
+    }
+
+    .rpt-table tbody tr:nth-child(even) th[scope="row"] {
+        background: var(--color-surface-soft);
+    }
+
+    .rpt-table tbody tr:hover th[scope="row"] {
+        background: #f4f7fb;
+    }
+
+.rpt-summary-table {
+    min-width: 760px;
+}
+
+    .rpt-summary-table td {
+        text-align: right;
+    }
+
+.rpt-table .rpt-empty {
+    padding: 28px 18px;
+    text-align: center;
+}
+
+.rpt-table .rpt-actions-column {
+    width: 200px;
+}
+
+.rpt-row-actions {
+    white-space: nowrap;
+    text-align: center;
+}
+/* Números, flechas y acciones heredan su diseño de los componentes comunes. */
+.rpt-pagination {
+    flex-wrap: wrap;
+    line-height: normal;
+}
+
+.rpt-page-info {
+    margin-top: 5px;
+    text-align: right;
+    font-size: 10px;
+    color: #777;
+    line-height: normal;
+}
+
+@media (max-width: 1000px) {
+    .rpt-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .rpt-index .reportes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .reportes-layout .barra-superior {
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px 14px;
+    }
+
+    .reportes-layout .titulo-sistema {
+        min-width: 0;
+        padding: 0;
+    }
+
+    .reportes-layout .usuario-sistema {
+        width: auto;
+        height: auto;
+        min-width: 0;
+        margin: 0;
+        padding: 8px 0 0;
+        align-items: flex-start;
+        border-left: 0;
+        border-top: 1px solid #cbd5e1;
+    }
+
+        .reportes-layout .usuario-sistema .bienvenido {
+            position: static;
+        }
+
+        .reportes-layout .usuario-sistema .user-info {
+            margin-top: 3px;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        .reportes-layout .usuario-sistema .cerrar-sesion-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            font-size: 12px;
+        }
+
+    .rpt-table-hint {
+        display: block;
+    }
+
+    .rpt-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .rpt-annual, .rpt-form, .rpt-filter-summary {
+        padding: 15px;
+    }
+
+    .rpt-index {
+        padding: 10px 0;
+    }
+
+        .rpt-index .reporte-card {
+            flex-wrap: wrap;
+        }
+
+        .rpt-index .reporte-contenido {
+            flex-basis: 160px;
+        }
+
+        .rpt-index .reporte-footer {
+            justify-content: stretch;
+        }
+
+        .rpt-index .reporte-boton {
+            width: 100%;
+        }
+
+    .rpt-annual-guide {
+        padding: 15px;
+    }
+
+    .rpt-annual-guide-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .rpt-page h2 {
+        font-size: 23px;
+    }
+
+    .rpt-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .rpt-page .rpt-button {
+        width: 100%;
+    }
+}

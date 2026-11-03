@@ -7,24 +7,25 @@
 <html lang="es">
 
 <head>
-
     <meta charset="utf-8" />
-    <meta name="viewport"content="width=device-width, initial-scale=1.0" />
 
-    <title>Inicio de sesión - InventarioEscuela</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
 
-        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>
+        Inicio de sesión - InventarioEscuela
+    </title>
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
 </head>
-
 
 <body class="pagina-login">
 
     <div class="login-container">
 
-
-        <!-- ======================================
-             PANEL IZQUIERDO
-             ======================================= -->
+        <!-- PANEL IZQUIERDO -->
 
         <div class="left-panel">
 
@@ -34,39 +35,42 @@
             </div>
 
             <div class="school-subtitle">
-                Gestion de inventario
+                Gestión de inventario
             </div>
 
         </div>
 
-
-        <!-- ======================================
-             PANEL DERECHO
-             ======================================= -->
+        <!-- PANEL DERECHO -->
 
         <div class="right-panel">
 
-
-            <!-- CONTENEDOR DEL LOGIN -->
-
             <div class="login-box">
 
-
-                <!-- TÍTULO -->
-
                 <h1 class="login-title">
-                    Inicio de sesion
+                    Inicio de sesión
                 </h1>
 
+                @if (TempData["PrimerAdministradorCreado"]
+                    is string mensajeExito)
+                {
+                    <div class="usuario-exito"
+                         role="status">
+                        @mensajeExito
+                    </div>
+                }
 
-                <!-- FORMULARIO -->
+                @if (TempData["ErrorPrimerAdministrador"]
+                    is string mensajeError)
+                {
+                    <div class="error-message"
+                         role="alert">
+                        @mensajeError
+                    </div>
+                }
 
                 <form asp-controller="Login"
                       asp-action="IniciarSesion"
                       method="post">
-
-
-                    <!-- CORREO -->
 
                     <div class="input-row">
 
@@ -82,9 +86,6 @@
 
                     </div>
 
-
-                    <!-- CONTRASEÑA -->
-
                     <div class="input-row">
 
                         <label for="clave">
@@ -99,41 +100,50 @@
 
                     </div>
 
-
-                    <!-- BOTÓN -->
-
                     <div class="button-container">
 
                         <button type="submit"
                                 class="login-button">
-
                             Log In
-
                         </button>
 
                     </div>
 
-
-                    <!-- MENSAJE DE ERROR -->
                     @if (ViewData["Mensaje"] != null)
                     {
-
-                        <div class="error-message">
-
+                        <div class="error-message"
+                             role="alert">
                             @ViewData["Mensaje"]
-
                         </div>
-
                     }
 
-
-                    <!-- REGISTRO -->
-
-                    <div class="register-link">
-                        Para obtener una cuenta, contacta al administrador.
-                    </div>
-
                 </form>
+
+                @if (ViewData["PuedeCrearPrimerAdministrador"]
+                    is true)
+                {
+                    <div class="registro-inicial-acciones">
+
+                        <p>
+                            Aún no hay usuarios registrados.
+                            Cree la primera cuenta de administrador.
+                        </p>
+
+                        <a asp-controller="Login"
+                           asp-action="PrimerAdministrador"
+                           class="btn-registrar">
+                            Crear primer administrador
+                        </a>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="register-link">
+                        Para obtener una cuenta,
+                        contacta al administrador.
+                    </div>
+                }
 
             </div>
 

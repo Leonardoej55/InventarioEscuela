@@ -1,330 +1,95 @@
 ﻿@model InventarioEscuela.ViewModels.ReporteEquiposMantenimientoViewModel
-
 @{
-    ViewData["Title"] = "Equipos en mantenimiento";
+    ViewData["Title"] = "Historial de mantenimientos";
+    bool avanzados = !ViewData.ModelState.IsValid || !string.IsNullOrWhiteSpace(Model.CodigoFiltro) || Model.IdMarcaFiltro.HasValue || !string.IsNullOrWhiteSpace(Model.ModeloFiltro) || !string.IsNullOrWhiteSpace(Model.SerieFiltro) || Model.IdTipoFiltro.HasValue || !string.IsNullOrWhiteSpace(Model.ResponsableFiltro);
 }
-
-<div class="registro-activo-container">
-
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
-    <h2 class="titulo-inventario">
-        Reporte de equipos en mantenimiento
-    </h2>
-
-
-    <p style="
-        margin-top:-5px;
-        margin-bottom:20px;
-        color:#666;
-        font-size:12px;">
-
-        Configure los filtros que desea aplicar.
-        El reporte incluirá los activos cuyo estado
-        actual sea En mantenimiento.
-
-    </p>
-
-
-    @if (TempData["ErrorReporte"] != null)
-    {
-        <div class="text-danger"
-             style="margin-bottom:15px;">
-
-            @TempData["ErrorReporte"]
-
-        </div>
-    }
-
-
-    <form asp-controller="Reportes"
-          asp-action="EquiposMantenimientoPreview"
-          method="get">
-
-
-        <!-- =========================================
-             IDENTIFICACIÓN
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Identificación del activo
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- CÓDIGO -->
-                <div class="registro-campo">
-
-                    <label>
-                        Código
-                    </label>
-
-                    <input type="text"
-                           name="codigoFiltro"
-                           value="@Model.CodigoFiltro"
-                           class="registro-input"
-                           placeholder="Número de identificación" />
-
-                </div>
-
-
-                <!-- DESCRIPCIÓN -->
-                <div class="registro-campo">
-
-                    <label>
-                        Descripción
-                    </label>
-
-                    <input type="text"
-                           name="descripcionFiltro"
-                           value="@Model.DescripcionFiltro"
-                           class="registro-input"
-                           placeholder="Descripción del activo" />
-
-                </div>
-
-
-                <!-- MARCA -->
-                <div class="registro-campo">
-
-                    <label>
-                        Marca
-                    </label>
-
-                    <select name="idMarcaFiltro"
-                            class="registro-input">
-
-                        <option value="">
-                            Todas las marcas
-                        </option>
-
-
-                        @foreach (var marca in Model.Marcas)
-                        {
-                            if (Model.IdMarcaFiltro ==
-                                marca.IdMarca)
-                            {
-                                <option value="@marca.IdMarca"
-                                        selected>
-
-                                    @marca.MarcaNombre
-
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@marca.IdMarca">
-
-                                    @marca.MarcaNombre
-
-                                </option>
-                            }
-                        }
-
-                    </select>
-
-                </div>
-
+<div class="rpt-page">
+    <a asp-controller="Reportes" asp-action="Index" class="rpt-back">← Todos los reportes</a>
+    <header class="rpt-header">
+        <h2>Historial de mantenimientos</h2>
+        <p>Consulte las intervenciones registradas. Un activo puede aparecer más de una vez; cada fila corresponde a un mantenimiento, no a un equipo pendiente.</p>
+    </header>
+    <partial name="_ErroresReporte" />
+    <form asp-controller="Reportes" asp-action="EquiposMantenimientoPreview" method="get" class="rpt-form">
+        <div class="rpt-fields">
+            <div class="rpt-field">
+                <label for="idUbicacionFiltro">Ubicación actual del activo</label>
+                <select asp-for="IdUbicacionFiltro" name="idUbicacionFiltro" id="idUbicacionFiltro">
+                    <option value="">Todas las ubicaciones</option>
+                    @foreach (var opcion in Model.Ubicaciones)
+                    {
+                        <option value="@opcion.IdUbicacion">@opcion.UbicacionNombre</option>
+                    }
+                </select>
+                <span asp-validation-for="IdUbicacionFiltro" class="rpt-field-error"></span>
             </div>
-
-        </div>
-
-
-        <!-- =========================================
-             INFORMACIÓN TÉCNICA
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información técnica
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- MODELO -->
-                <div class="registro-campo">
-
-                    <label>
-                        Modelo
-                    </label>
-
-                    <input type="text"
-                           name="modeloFiltro"
-                           value="@Model.ModeloFiltro"
-                           class="registro-input"
-                           placeholder="Modelo" />
-
-                </div>
-
-
-                <!-- SERIE -->
-                <div class="registro-campo">
-
-                    <label>
-                        Serie
-                    </label>
-
-                    <input type="text"
-                           name="serieFiltro"
-                           value="@Model.SerieFiltro"
-                           class="registro-input"
-                           placeholder="Serie" />
-
-                </div>
-
-
-                <!-- UBICACIÓN -->
-                <div class="registro-campo">
-
-                    <label>
-                        Ubicación
-                    </label>
-
-                    <select name="idUbicacionFiltro"
-                            class="registro-input">
-
-                        <option value="">
-                            Todas las ubicaciones
-                        </option>
-
-
-                        @foreach (var ubicacion
-                            in Model.Ubicaciones)
-                        {
-                            if (Model.IdUbicacionFiltro ==
-                                ubicacion.IdUbicacion)
-                            {
-                                <option value="@ubicacion.IdUbicacion"
-                                        selected>
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@ubicacion.IdUbicacion">
-
-                                    @ubicacion.UbicacionNombre
-
-                                </option>
-                            }
-                        }
-
-                    </select>
-
-                </div>
-
+            <div class="rpt-field">
+                <label for="descripcionFiltro">Descripción del activo</label>
+                <input asp-for="DescripcionFiltro" name="descripcionFiltro" id="descripcionFiltro" type="text" />
+                <span asp-validation-for="DescripcionFiltro" class="rpt-field-error"></span>
             </div>
-
-        </div>
-
-
-        <!-- =========================================
-             DATOS DEL MANTENIMIENTO
-             ========================================= -->
-        <div class="registro-seccion">
-
-            <h3 class="registro-seccion-titulo">
-                Información del mantenimiento
-            </h3>
-
-
-            <div class="registro-grid">
-
-
-                <!-- TIPO -->
-                <div class="registro-campo">
-
-                    <label>
-                        Tipo de mantenimiento
-                    </label>
-
-                    <select name="idTipoFiltro"
-                            class="registro-input">
-
-                        <option value="">
-                            Todos los tipos
-                        </option>
-
-
-                        @foreach (var tipo
-                            in Model.TiposMantenimiento)
-                        {
-                            if (Model.IdTipoFiltro ==
-                                tipo.IdTipo)
-                            {
-                                <option value="@tipo.IdTipo"
-                                        selected>
-
-                                    @tipo.Mantenimiento
-
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@tipo.IdTipo">
-
-                                    @tipo.Mantenimiento
-
-                                </option>
-                            }
-                        }
-
-                    </select>
-
-                </div>
-
-
-                <!-- RESPONSABLE -->
-                <div class="registro-campo">
-
-                    <label>
-                        Responsable
-                    </label>
-
-                    <input type="text"
-                           name="responsableFiltro"
-                           value="@Model.ResponsableFiltro"
-                           class="registro-input"
-                           placeholder="Responsable" />
-
-                </div>
-
+            <div class="rpt-field">
+                <label for="fechaDesde">Fecha de mantenimiento desde</label>
+                <input asp-for="FechaDesde" name="fechaDesde" id="fechaDesde" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span asp-validation-for="FechaDesde" class="rpt-field-error"></span>
             </div>
-
+            <div class="rpt-field">
+                <label for="fechaHasta">Fecha de mantenimiento hasta, inclusive</label>
+                <input asp-for="FechaHasta" name="fechaHasta" id="fechaHasta" type="date" asp-format="{0:yyyy-MM-dd}" />
+                <span asp-validation-for="FechaHasta" class="rpt-field-error"></span>
+            </div>
         </div>
-
-
-        <!-- =========================================
-             BOTONES
-             ========================================= -->
-        <div class="registro-botones">
-
-            <a asp-controller="Reportes"
-               asp-action="Index"
-               class="btn-accion">
-
-                Volver a reportes
-
-            </a>
-
-
-            <button type="submit"
-                    class="btn-registrar">
-
-                Vista previa
-
-            </button>
-
+        <details class="rpt-advanced" open="@(avanzados ? "open" : null)">
+            <summary>Más filtros (opcionales)</summary>
+            <div class="rpt-fields">
+                <div class="rpt-field">
+                    <label for="codigoFiltro">Código</label>
+                    <input asp-for="CodigoFiltro" name="codigoFiltro" id="codigoFiltro" type="text" />
+                    <span asp-validation-for="CodigoFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="idMarcaFiltro">Marca</label>
+                    <select asp-for="IdMarcaFiltro" name="idMarcaFiltro" id="idMarcaFiltro">
+                        <option value="">Todas las marcas</option>
+                        @foreach (var opcion in Model.Marcas)
+                        {
+                            <option value="@opcion.IdMarca">@opcion.MarcaNombre</option>
+                        }
+                    </select>
+                    <span asp-validation-for="IdMarcaFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="modeloFiltro">Modelo</label>
+                    <input asp-for="ModeloFiltro" name="modeloFiltro" id="modeloFiltro" type="text" />
+                    <span asp-validation-for="ModeloFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="serieFiltro">Número de serie</label>
+                    <input asp-for="SerieFiltro" name="serieFiltro" id="serieFiltro" type="text" />
+                    <span asp-validation-for="SerieFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="idTipoFiltro">Tipo de mantenimiento</label>
+                    <select asp-for="IdTipoFiltro" name="idTipoFiltro" id="idTipoFiltro">
+                        <option value="">Todos los tipos</option>
+                        @foreach (var opcion in Model.TiposMantenimiento)
+                        {
+                            <option value="@opcion.IdTipo">@opcion.Mantenimiento</option>
+                        }
+                    </select>
+                    <span asp-validation-for="IdTipoFiltro" class="rpt-field-error"></span>
+                </div>
+                <div class="rpt-field">
+                    <label for="responsableFiltro">Responsable</label>
+                    <input asp-for="ResponsableFiltro" name="responsableFiltro" id="responsableFiltro" type="text" />
+                    <span asp-validation-for="ResponsableFiltro" class="rpt-field-error"></span>
+                </div>
+            </div>
+        </details>
+        <p class="rpt-help">Las fechas corresponden al mantenimiento. La ubicación es la actual del activo. El historial no indica si una intervención sigue abierta o ya terminó.</p>
+        <div class="rpt-actions">
+            <button type="submit" class="rpt-button">Consultar resultados</button>
+            <a asp-controller="Reportes" asp-action="EquiposMantenimiento" class="rpt-button rpt-button-secondary">Limpiar filtros</a>
         </div>
-
     </form>
-
 </div>

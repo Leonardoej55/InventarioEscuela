@@ -24,7 +24,7 @@ $.extend( $.fn, {
 		// If nothing is selected, return nothing; can't chain anyway
 		if ( !this.length ) {
 			if ( options && options.debug && window.console ) {
-				console.warn( "Nothing selected, can't validate, returning nothing." );
+				console.warn("Nada seleccionado, no se puede validar, no se devuelve nada.");
 			}
 			return;
 		}
@@ -370,22 +370,22 @@ $.extend( $.validator, {
 	},
 
 	messages: {
-		required: "This field is required.",
-		remote: "Please fix this field.",
-		email: "Please enter a valid email address.",
-		url: "Please enter a valid URL.",
-		date: "Please enter a valid date.",
-		dateISO: "Please enter a valid date (ISO).",
-		number: "Please enter a valid number.",
-		digits: "Please enter only digits.",
-		equalTo: "Please enter the same value again.",
-		maxlength: $.validator.format( "Please enter no more than {0} characters." ),
-		minlength: $.validator.format( "Please enter at least {0} characters." ),
-		rangelength: $.validator.format( "Please enter a value between {0} and {1} characters long." ),
-		range: $.validator.format( "Please enter a value between {0} and {1}." ),
-		max: $.validator.format( "Please enter a value less than or equal to {0}." ),
-		min: $.validator.format( "Please enter a value greater than or equal to {0}." ),
-		step: $.validator.format( "Please enter a multiple of {0}." )
+		required: "Este campo es obligatorio.",
+		remote: "Por favor, corrige este campo.",
+		email: "Por favor, ingresa una dirección de correo electrónico válida.",
+		url: "Por favor, ingresa una URL válida.",
+		date: "Por favor, ingresa una fecha válida.",
+		dateISO: "Por favor, ingresa una fecha válida (ISO).",
+		number: "Por favor, ingresa un número válido.",
+		digits: "Por favor, ingresa solo dígitos.",
+		equalTo: "Por favor, ingresa el mismo valor de nuevo.",
+		maxlength: $.validator.format("Por favor, no ingreses más de {0} caracteres."),
+		minlength: $.validator.format("Por favor, ingresa al menos {0} caracteres."),
+		rangelength: $.validator.format("Por favor, ingresa un valor de entre {0} y {1} caracteres."),
+		range: $.validator.format("Por favor, ingresa un valor entre {0} y {1}."),
+		max: $.validator.format("Por favor, ingresa un valor menor o igual a {0}."),
+		min: $.validator.format("Por favor, ingresa un valor mayor o igual a {0}."),
+		step: $.validator.format("Por favor, ingresa un múltiplo de {0}.")
 	},
 
 	autoCreateRanges: false,
@@ -661,7 +661,7 @@ $.extend( $.validator, {
 				var isContentEditable = typeof $( this ).attr( "contenteditable" ) !== "undefined" && $( this ).attr( "contenteditable" ) !== "false";
 
 				if ( !name && validator.settings.debug && window.console ) {
-					console.error( "%o has no name assigned", this );
+					console.error("%o no tiene un atributo name asignado", this);
 				}
 
 				// Set form expando on contenteditable
@@ -820,11 +820,11 @@ $.extend( $.validator, {
 						return false;
 					}
 				} catch ( e ) {
-					if ( this.settings.debug && window.console ) {
-						console.log( "Exception occurred when checking element " + element.id + ", check the '" + rule.method + "' method.", e );
+					if (this.settings.debug && window.console) {
+						console.log("Ocurrió una excepción al validar el elemento " + element.id + ", revisa el método '" + rule.method + "'.", e);
 					}
-					if ( e instanceof TypeError ) {
-						e.message += ".  Exception occurred when checking element " + element.id + ", check the '" + rule.method + "' method.";
+					if (e instanceof TypeError) {
+						e.message += ".  Ocurrió una excepción al validar el elemento " + element.id + ", revisa el método '" + rule.method + "'.";
 					}
 
 					throw e;
@@ -1547,7 +1547,7 @@ $.extend( $.validator, {
 		// https://jqueryvalidation.org/step-method/
 		step: function( value, element, param ) {
 			var type = $( element ).attr( "type" ),
-				errorMessage = "Step attribute on input type " + type + " is not supported.",
+				errorMessage = "El atributo step en el input de tipo " + type + " no está soportado.",
 				supportedTypes = [ "text", "number", "range" ],
 				re = new RegExp( "\\b" + type + "\\b" ),
 				notSupported = type && !re.test( supportedTypes.join() ),

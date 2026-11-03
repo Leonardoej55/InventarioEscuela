@@ -1,0 +1,12 @@
+﻿@model InventarioEscuela.Models.Activo
+@{
+    var retorno = string.Concat(Context.Request.PathBase.Value, Context.Request.Path.Value, Context.Request.QueryString.Value);
+}
+<div class="rpt-row-actions">
+    <a asp-controller="Inventario" asp-action="Details" asp-route-id="@Model.IdActivo" asp-route-returnUrl="@retorno" class="btn-ver" aria-label="Ver activo @Model.NumeroIdentificacion">Ver</a>
+    @if (User.IsInRole("Administrador") || User.IsInRole("Secretario"))
+    {
+        <a asp-controller="Inventario" asp-action="Edit" asp-route-id="@Model.IdActivo" asp-route-returnUrl="@retorno" class="btn-editar" aria-label="Editar activo @Model.NumeroIdentificacion">Editar</a>
+        <a asp-controller="Movimientos" asp-action="Create" asp-route-idActivo="@Model.IdActivo" class="btn-ver" aria-label="Registrar traslado del activo @Model.NumeroIdentificacion">Trasladar</a>
+    }
+</div>

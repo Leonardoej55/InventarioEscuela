@@ -1,119 +1,308 @@
 ﻿@model InventarioEscuela.ViewModels.RegistroViewModel
 
 @{
-    Layout = "_Layout";
-    ViewData["Title"] = "Registrar usuario";
+    bool esPrimerAdministrador =
+        ViewData["EsPrimerAdministrador"] is true;
+
+    string accionRegistro =
+        esPrimerAdministrador
+            ? "PrimerAdministrador"
+            : "Registro";
+
+    Layout = esPrimerAdministrador
+        ? "_LayoutInicial"
+        : "_Layout";
+
+    ViewData["Title"] = esPrimerAdministrador
+        ? "Crear primer administrador"
+        : "Registrar usuario";
 }
 
-<div class="registro-activo-container registro-usuario-container">
-    <h2 class="titulo-inventario">Registrar nuevo usuario</h2>
+<div class="registro-activo-container
+    registro-usuario-container">
+
+    <h2 class="titulo-inventario">
+        @(esPrimerAdministrador
+            ? "Crear primer administrador"
+            : "Registrar nuevo usuario")
+    </h2>
+
+    @if (esPrimerAdministrador)
+    {
+        <p class="usuario-ayuda">
+            Esta opción solo está disponible mientras
+            no haya usuarios registrados.
+        </p>
+    }
 
     @if (TempData["RegistroExitoso"] is string mensaje)
     {
-        <div class="usuario-exito" role="status">@mensaje</div>
+        <div class="usuario-exito"
+             role="status">
+            @mensaje
+        </div>
     }
 
-    <form asp-controller="Login" asp-action="Registro" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <form asp-controller="Login"
+          asp-action="@accionRegistro"
+          method="post">
+
+        <div asp-validation-summary="ModelOnly"
+             class="text-danger"
+             role="alert">
+        </div>
 
         <div class="registro-seccion">
-            <h3 class="registro-seccion-titulo">Información del usuario</h3>
+
+            <h3 class="registro-seccion-titulo">
+                Información del usuario
+            </h3>
 
             <div class="registro-grid">
+
                 <div class="registro-campo">
-                    <label asp-for="Nombre">Nombre completo</label>
-                    <input asp-for="Nombre" class="registro-input"
+
+                    <label asp-for="Nombre">
+                        Nombre completo
+                    </label>
+
+                    <input asp-for="Nombre"
+                           class="registro-input"
                            placeholder="Nombre y apellidos"
-                           autocomplete="name" maxlength="100" required />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                           autocomplete="name"
+                           maxlength="100"
+                           required />
+
+                    <span asp-validation-for="Nombre"
+                          class="text-danger">
+                    </span>
+
                 </div>
 
                 <div class="registro-campo">
-                    <label asp-for="Correo">Correo electrónico</label>
-                    <input asp-for="Correo" type="email" class="registro-input"
+
+                    <label asp-for="Correo">
+                        Correo electrónico
+                    </label>
+
+                    <input asp-for="Correo"
+                           type="email"
+                           class="registro-input"
                            placeholder="Ej: nombre@correo.com"
-                           autocomplete="email" maxlength="100" required />
-                    <span asp-validation-for="Correo" class="text-danger"></span>
+                           autocomplete="email"
+                           maxlength="100"
+                           required />
+
+                    <span asp-validation-for="Correo"
+                          class="text-danger">
+                    </span>
+
                 </div>
+
             </div>
+
         </div>
 
         <div class="registro-seccion">
-            <h3 class="registro-seccion-titulo">Rol y permisos</h3>
 
-            <div class="registro-grid">
-                <div class="registro-campo">
-                    <label asp-for="Rol">Tipo de usuario</label>
-                    <select asp-for="Rol" class="registro-input"
-                            aria-describedby="ayuda-rol" required>
-                        <option value="Usuario">Usuario</option>
-                        <option value="Secretario">Secretario</option>
-                        <option value="Administrador">Administrador</option>
-                    </select>
-                    <span asp-validation-for="Rol" class="text-danger"></span>
-                    <p id="ayuda-rol" class="usuario-ayuda">
-                        Seleccione el rol según las tareas que realizará esta persona.
-                    </p>
-                </div>
+            <h3 class="registro-seccion-titulo">
+                Rol y permisos
+            </h3>
 
-                <div class="usuario-permisos usuario-ayuda">
-                    <p><strong>Administrador:</strong> acceso total y gestión de cuentas.</p>
-                    <p><strong>Secretario:</strong> gestión del inventario, movimientos y mantenimientos.</p>
-                    <p><strong>Usuario:</strong> consulta de registros y descarga de reportes.</p>
+            @if (esPrimerAdministrador)
+            {
+                <p class="usuario-ayuda">
+                    <strong>Administrador:</strong>
+                    acceso total y gestión de cuentas.
+                </p>
+            }
+            else
+            {
+                <div class="registro-grid">
+
+                    <div class="registro-campo">
+
+                        <label asp-for="Rol">
+                            Tipo de usuario
+                        </label>
+
+                        <select asp-for="Rol"
+                                class="registro-input"
+                                aria-describedby="ayuda-rol"
+                                required>
+
+                            <option value="Usuario">
+                                Usuario
+                            </option>
+
+                            <option value="Secretario">
+                                Secretario
+                            </option>
+
+                            <option value="Administrador">
+                                Administrador
+                            </option>
+
+                        </select>
+
+                        <span asp-validation-for="Rol"
+                              class="text-danger">
+                        </span>
+
+                        <p id="ayuda-rol"
+                           class="usuario-ayuda">
+                            Seleccione el rol según las
+                            tareas que realizará esta persona.
+                        </p>
+
+                    </div>
+
+                    <div class="usuario-permisos
+                        usuario-ayuda">
+
+                        <p>
+                            <strong>Administrador:</strong>
+                            acceso total y gestión de cuentas.
+                        </p>
+
+                        <p>
+                            <strong>Secretario:</strong>
+                            gestión del inventario,
+                            movimientos y mantenimientos.
+                        </p>
+
+                        <p>
+                            <strong>Usuario:</strong>
+                            consulta de registros y
+                            descarga de reportes.
+                        </p>
+
+                    </div>
+
                 </div>
-            </div>
+            }
+
         </div>
 
         <div class="registro-seccion">
-            <h3 class="registro-seccion-titulo">Seguridad de la cuenta</h3>
+
+            <h3 class="registro-seccion-titulo">
+                Seguridad de la cuenta
+            </h3>
 
             <div class="registro-grid">
+
                 <div class="registro-campo">
-                    <label asp-for="Password">Contraseña</label>
-                    <input asp-for="Password" type="password" class="registro-input"
+
+                    <label asp-for="Password">
+                        Contraseña
+                    </label>
+
+                    <input asp-for="Password"
+                           type="password"
+                           class="registro-input"
                            placeholder="Ingrese una contraseña"
-                           autocomplete="new-password" minlength="12" maxlength="128"
-                           aria-describedby="ayuda-password" required />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                    <p id="ayuda-password" class="usuario-ayuda">
-                        Use entre 12 y 128 caracteres. Puede utilizar una frase larga.
+                           autocomplete="new-password"
+                           minlength="12"
+                           maxlength="128"
+                           aria-describedby="ayuda-password"
+                           required />
+
+                    <span asp-validation-for="Password"
+                          class="text-danger">
+                    </span>
+
+                    <p id="ayuda-password"
+                       class="usuario-ayuda">
+                        Use entre 12 y 128 caracteres.
+                        Puede utilizar una frase larga.
                     </p>
+
                 </div>
 
                 <div class="registro-campo">
-                    <label asp-for="ConfirmarPassword">Confirmar contraseña</label>
-                    <input asp-for="ConfirmarPassword" type="password" class="registro-input"
+
+                    <label asp-for="ConfirmarPassword">
+                        Confirmar contraseña
+                    </label>
+
+                    <input asp-for="ConfirmarPassword"
+                           type="password"
+                           class="registro-input"
                            placeholder="Repita la contraseña"
-                           autocomplete="new-password" required />
-                    <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+                           autocomplete="new-password"
+                           required />
+
+                    <span asp-validation-for="ConfirmarPassword"
+                          class="text-danger">
+                    </span>
+
                 </div>
 
                 <div class="registro-campo-completo">
-                    <label class="usuario-mostrar-claves" for="mostrar-passwords">
-                        <input type="checkbox" id="mostrar-passwords" />
+
+                    <label class="usuario-mostrar-claves"
+                           for="mostrar-passwords">
+
+                        <input type="checkbox"
+                               id="mostrar-passwords" />
+
                         Mostrar contraseñas
+
                     </label>
+
                 </div>
+
             </div>
+
         </div>
 
         <div class="registro-botones">
-            <a asp-controller="Home" asp-action="Index" class="btn-accion">Cancelar</a>
-            <button type="submit" class="btn-registrar">Registrar usuario</button>
+
+            <a asp-controller="@(esPrimerAdministrador
+                                   ? "Login"
+                                   : "Home")"
+               asp-action="@(esPrimerAdministrador
+                                   ? "IniciarSesion"
+                                   : "Index")"
+               class="btn-accion">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="btn-registrar">
+
+                @(esPrimerAdministrador
+                    ? "Crear administrador"
+                    : "Registrar usuario")
+
+            </button>
+
         </div>
+
     </form>
+
 </div>
 
 @section Scripts
 {
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        document.getElementById("mostrar-passwords").addEventListener("change", function () {
-            const tipo = this.checked ? "text" : "password";
-            document.getElementById("Password").type = tipo;
-            document.getElementById("ConfirmarPassword").type = tipo;
-        });
+        document
+            .getElementById("mostrar-passwords")
+            .addEventListener("change", function () {
+                const tipo =
+                    this.checked ? "text" : "password";
+
+                document.getElementById("Password").type =
+                    tipo;
+
+                document
+                    .getElementById("ConfirmarPassword")
+                    .type = tipo;
+            });
     </script>
 }

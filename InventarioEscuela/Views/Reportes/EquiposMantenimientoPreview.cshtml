@@ -1,534 +1,77 @@
 ﻿@model InventarioEscuela.ViewModels.ReporteEquiposMantenimientoViewModel
-
 @{
-    ViewData["Title"] = "Vista previa - Equipos en mantenimiento";
-
-    int paginasVisibles = 5;
-
-    int paginaInicio =
-        Math.Max(
-            1,
-            Model.PaginaActual - 2);
-
-    int paginaFin =
-        Math.Min(
-            Model.TotalPaginas,
-            paginaInicio + paginasVisibles - 1);
-
-    if (paginaFin - paginaInicio + 1 < paginasVisibles)
-    {
-        paginaInicio =
-            Math.Max(
-                1,
-                paginaFin - paginasVisibles + 1);
-    }
+    ViewData["Title"] = "Historial de mantenimientos · Resultados";
+    ViewData["AccionReporte"] = "EquiposMantenimiento";
+    int desde = Model.TotalResultados == 0 ? 0 : (Model.PaginaActual - 1) * Model.TamanoPagina + 1;
+    int hasta = Math.Min(Model.PaginaActual * Model.TamanoPagina, Model.TotalResultados);
 }
-
-
-<div class="dashboard-page">
-
-
-    <!-- =========================================
-         TÍTULO
-         ========================================= -->
-    <h2 class="dashboard-section-title">
-        Vista previa - Equipos en mantenimiento
-    </h2>
-
-
-    <div style="
-        margin-bottom:15px;
-        font-size:11px;
-        color:#666;">
-
-        Revise la información antes de generar
-        el documento PDF.
-
-    </div>
-
-
-    <!-- =========================================
-         RESUMEN
-         ========================================= -->
-    <div class="dashboard-resumen">
-
-
-        <!-- TOTAL -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                🛠️
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalResultados
-                </div>
-
-                <div class="dashboard-card-title">
-                    En mantenimiento
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- UBICACIONES -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                📍
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalUbicaciones
-                </div>
-
-                <div class="dashboard-card-title">
-                    Ubicaciones
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- TIPOS -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                🔧
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalTiposMantenimiento
-                </div>
-
-                <div class="dashboard-card-title">
-                    Tipos de mantenimiento
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- RESPONSABLES -->
-        <div class="dashboard-card">
-
-            <div class="dashboard-card-icon">
-                👤
-            </div>
-
-            <div class="dashboard-card-content">
-
-                <div class="dashboard-card-number">
-                    @Model.TotalResponsables
-                </div>
-
-                <div class="dashboard-card-title">
-                    Responsables
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================================
-         RESULTADOS
-         ========================================= -->
-    <div style="
-        margin-top:10px;
-        margin-bottom:8px;
-        font-size:11px;
-        color:#666;">
-
-        Mostrando
-
-        <strong>
-            @(
-                Model.TotalResultados == 0
-                ? 0
-                : ((Model.PaginaActual - 1)
-                    * Model.TamanoPagina) + 1
-            )
-        </strong>
-
-        -
-
-        <strong>
-            @Math.Min(
-                Model.PaginaActual *
-                Model.TamanoPagina,
-                Model.TotalResultados)
-        </strong>
-
-        de
-
-        <strong>
-            @Model.TotalResultados
-        </strong>
-
-        registros.
-
-    </div>
-
-
-    <!-- =========================================
-         TABLA
-         ========================================= -->
-    <div class="dashboard-table-container">
-
-        <table class="tabla-base dashboard-table">
-
+<div class="rpt-page">
+    <a asp-controller="Reportes" asp-action="Index" class="rpt-back">← Todos los reportes</a>
+    <header class="rpt-header">
+        <h2>Historial de mantenimientos</h2>
+        <p>Consulte los resultados y descargue el reporte completo cuando lo necesite.</p>
+    </header>
+    <partial name="_ErroresReporte" />
+    <partial name="_FiltrosAplicados" model="Model" />
+    <dl class="rpt-totals">
+        <div><dt>Intervenciones registradas</dt><dd>@Model.TotalResultados</dd></div>
+        <div><dt>Activos distintos</dt><dd>@Model.TotalActivos</dd></div>
+        <div><dt>Tipos de mantenimiento</dt><dd>@Model.TotalTiposMantenimiento</dd></div>
+        <div><dt>Responsables</dt><dd>@Model.TotalResponsables</dd></div>
+    </dl>
+    <partial name="_AccionesReporte" model="Model" />
+    <p class="rpt-callout">Cada fila es una intervención registrada. Un mismo activo puede aparecer varias veces; estos datos no permiten determinar cuáles mantenimientos siguen abiertos.</p>
+    <h3>Detalle de resultados</h3>
+    <p class="rpt-result-count">Mostrando <strong>@desde–@hasta</strong> de <strong>@Model.TotalResultados</strong> registros. Los totales y las descargas corresponden a todos los resultados.</p>
+    <p class="rpt-table-hint">Deslice la tabla hacia los lados para consultar todas las columnas.</p>
+    <div class="dashboard-table-container rpt-table-wrap" role="region" aria-label="Detalle del reporte" tabindex="0">
+        <table class="tabla-base dashboard-table rpt-table">
+            <caption>Historial de mantenimientos: resultados de la página actual.</caption>
             <thead>
-
                 <tr>
-
-                    <th>
-                        Código
-                    </th>
-
-                    <th>
-                        Descripción
-                    </th>
-
-                    <th>
-                        Marca
-                    </th>
-
-                    <th>
-                        Modelo
-                    </th>
-
-                    <th>
-                        Ubicación
-                    </th>
-
-                    <th>
-                        Tipo mantenimiento
-                    </th>
-
-                    <th>
-                        Fecha
-                    </th>
-
-                    <th>
-                        Responsable
-                    </th>
-
-                    <th>
-                        Observaciones
-                    </th>
-
+                    <th scope="col">Fecha de mantenimiento</th>
+                    <th scope="col">Código</th>
+                    <th scope="col">Descripción del activo</th>
+                    <th scope="col">Marca</th>
+                    <th scope="col">Modelo</th>
+                    <th scope="col">Ubicación actual</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Responsable</th>
+                    <th scope="col">Observaciones</th>
+                    <th scope="col" class="rpt-actions-column">Acciones</th>
                 </tr>
-
             </thead>
-
-
             <tbody>
-
                 @if (Model.Mantenimientos.Any())
                 {
-                    foreach (var mantenimiento
-                        in Model.Mantenimientos)
+                    foreach (var mantenimiento in Model.Mantenimientos)
                     {
                         <tr>
-
-                            <td>
-                                @(mantenimiento.Activo?
-                                    .NumeroIdentificacion
-                                    ?? "N/I")
+                            <td>@mantenimiento.FechaMantenimiento.ToString("dd/MM/yyyy")</td>
+                            <td>@(mantenimiento.Activo?.NumeroIdentificacion ?? "No informado")</td>
+                            <td>@(mantenimiento.Activo?.Descripcion ?? "No informado")</td>
+                            <td>@(mantenimiento.Activo?.Marca?.MarcaNombre ?? "No informado")</td>
+                            <td>@(string.IsNullOrWhiteSpace(mantenimiento.Activo?.Modelo) ? "No informado" : mantenimiento.Activo?.Modelo)</td>
+                            <td>@(mantenimiento.Activo?.Ubicacion?.UbicacionNombre ?? "Sin ubicación")</td>
+                            <td>@(mantenimiento.TipoMantenimiento?.Mantenimiento ?? "No informado")</td>
+                            <td>@(string.IsNullOrWhiteSpace(mantenimiento.Responsable) ? "No informado" : mantenimiento.Responsable)</td>
+                            <td>@(string.IsNullOrWhiteSpace(mantenimiento.Descripcion) ? "Sin observaciones" : mantenimiento.Descripcion)</td>
+                            <td class="acciones">
+                                @if (mantenimiento.Activo != null)
+                                {
+                                    <partial name="_AccionesActivo" model="mantenimiento.Activo" />
+                                }
                             </td>
-
-
-                            <td>
-                                @(mantenimiento.Activo?
-                                    .Descripcion
-                                    ?? "N/I")
-                            </td>
-
-
-                            <td>
-                                @(mantenimiento.Activo?
-                                    .Marca?
-                                    .MarcaNombre
-                                    ?? "N/I")
-                            </td>
-
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    mantenimiento.Activo?.Modelo)
-                                    ? "N/I"
-                                    : mantenimiento.Activo.Modelo)
-                            </td>
-
-
-                            <td>
-                                @(mantenimiento.Activo?
-                                    .Ubicacion?
-                                    .UbicacionNombre
-                                    ?? "N/I")
-                            </td>
-
-
-                            <td>
-                                @(mantenimiento
-                                    .TipoMantenimiento?
-                                    .Mantenimiento
-                                    ?? "N/I")
-                            </td>
-
-
-                            <td>
-                                @(mantenimiento
-                                    .FechaMantenimiento
-                                    .ToString("dd/MM/yyyy"))
-                            </td>
-
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    mantenimiento.Responsable)
-                                    ? "N/I"
-                                    : mantenimiento.Responsable)
-                            </td>
-
-
-                            <td>
-                                @(string.IsNullOrWhiteSpace(
-                                    mantenimiento.Descripcion)
-                                    ? "Sin observaciones"
-                                    : mantenimiento.Descripcion)
-                            </td>
-
                         </tr>
                     }
                 }
                 else
                 {
-                    <tr>
-
-                        <td colspan="9"
-                            style="
-                            text-align:center;
-                            padding:14px;">
-
-                            No se encontraron equipos
-                            en mantenimiento.
-
-                        </td>
-
-                    </tr>
+                    <tr><td colspan="10" class="rpt-empty">No se encontraron resultados con estos filtros. Puede modificarlos o limpiarlos para ampliar la consulta.</td></tr>
                 }
-
             </tbody>
-
         </table>
-
     </div>
-
-
-    <!-- =========================================
-         PAGINACIÓN
-         ========================================= -->
-    @if (Model.TotalPaginas > 1)
-    {
-        <div class="dashboard-pagination">
-
-
-            @if (Model.PaginaActual > 1)
-            {
-                <!-- PRIMERA -->
-                <a asp-controller="Reportes"
-                   asp-action="EquiposMantenimientoPreview"
-                   asp-route-pagina="1"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
-                   class="dashboard-page-arrow">
-
-                    «
-
-                </a>
-
-
-                <!-- ANTERIOR -->
-                <a asp-controller="Reportes"
-                   asp-action="EquiposMantenimientoPreview"
-                   asp-route-pagina="@(Model.PaginaActual - 1)"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
-                   class="dashboard-page-arrow">
-
-                    ‹
-
-                </a>
-            }
-
-
-            @for (int i = paginaInicio;
-                  i <= paginaFin;
-                  i++)
-            {
-                if (i == Model.PaginaActual)
-                {
-                    <span class="dashboard-page-number active">
-
-                        @i
-
-                    </span>
-                }
-                else
-                {
-                    <a asp-controller="Reportes"
-                       asp-action="EquiposMantenimientoPreview"
-                       asp-route-pagina="@i"
-                       asp-route-codigoFiltro="@Model.CodigoFiltro"
-                       asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                       asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                       asp-route-modeloFiltro="@Model.ModeloFiltro"
-                       asp-route-serieFiltro="@Model.SerieFiltro"
-                       asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                       asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-                       asp-route-responsableFiltro="@Model.ResponsableFiltro"
-                       class="dashboard-page-number">
-
-                        @i
-
-                    </a>
-                }
-            }
-
-
-            @if (Model.PaginaActual <
-                Model.TotalPaginas)
-            {
-                <!-- SIGUIENTE -->
-                <a asp-controller="Reportes"
-                   asp-action="EquiposMantenimientoPreview"
-                   asp-route-pagina="@(Model.PaginaActual + 1)"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
-                   class="dashboard-page-arrow">
-
-                    ›
-
-                </a>
-
-
-                <!-- ÚLTIMA -->
-                <a asp-controller="Reportes"
-                   asp-action="EquiposMantenimientoPreview"
-                   asp-route-pagina="@Model.TotalPaginas"
-                   asp-route-codigoFiltro="@Model.CodigoFiltro"
-                   asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-                   asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-                   asp-route-modeloFiltro="@Model.ModeloFiltro"
-                   asp-route-serieFiltro="@Model.SerieFiltro"
-                   asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-                   asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-                   asp-route-responsableFiltro="@Model.ResponsableFiltro"
-                   class="dashboard-page-arrow">
-
-                    »
-
-                </a>
-            }
-
-        </div>
-
-
-        <div style="
-            text-align:right;
-            margin-top:5px;
-            font-size:10px;
-            color:#777;">
-
-            Página
-
-            <strong>
-                @Model.PaginaActual
-            </strong>
-
-            de
-
-            <strong>
-                @Model.TotalPaginas
-            </strong>
-
-        </div>
-    }
-
-
-    <!-- =========================================
-         BOTONES
-         ========================================= -->
-    <div class="registro-botones">
-
-        <a asp-controller="Reportes"
-           asp-action="EquiposMantenimiento"
-           asp-route-codigoFiltro="@Model.CodigoFiltro"
-           asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-           asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-           asp-route-modeloFiltro="@Model.ModeloFiltro"
-           asp-route-serieFiltro="@Model.SerieFiltro"
-           asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-           asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-           asp-route-responsableFiltro="@Model.ResponsableFiltro"
-           class="btn-accion">
-
-            Modificar filtros
-
-        </a>
-
-
-        @if (Model.TotalResultados > 0)
-        {
-            <a asp-controller="Reportes"
-               asp-action="GenerarEquiposMantenimientoPdf"
-               asp-route-codigoFiltro="@Model.CodigoFiltro"
-               asp-route-descripcionFiltro="@Model.DescripcionFiltro"
-               asp-route-idMarcaFiltro="@Model.IdMarcaFiltro"
-               asp-route-modeloFiltro="@Model.ModeloFiltro"
-               asp-route-serieFiltro="@Model.SerieFiltro"
-               asp-route-idUbicacionFiltro="@Model.IdUbicacionFiltro"
-               asp-route-idTipoFiltro="@Model.IdTipoFiltro"
-               asp-route-responsableFiltro="@Model.ResponsableFiltro"
-               class="btn-registrar">
-
-                Generar PDF
-
-            </a>
-        }
-
-    </div>
-
+    <partial name="_Paginacion" model="Model" />
+    <p class="rpt-help">Use «Ver» para consultar sus datos. Administradores y secretarios pueden corregir estado u observaciones con «Editar». Para cambiar la ubicación, use «Trasladar» y conserve el historial del activo.</p>
 </div>

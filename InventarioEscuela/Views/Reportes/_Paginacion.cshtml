@@ -1,0 +1,40 @@
+﻿@model InventarioEscuela.ViewModels.ReporteBaseViewModel
+@{
+    var accion = ViewContext.RouteData.Values["action"]?.ToString();
+    var inicio = Math.Max(1, Model.PaginaActual - 2);
+    var fin = Math.Min(Model.TotalPaginas, inicio + 4);
+    inicio = Math.Max(1, fin - 4);
+    Dictionary<string, string> Rutas(int pagina)
+    {
+        var rutas = InventarioEscuela.ViewModels.RutasReporte.Crear(Model);
+        rutas["pagina"] = pagina.ToString();
+        return rutas;
+    }
+}
+@if (Model.TotalPaginas > 1)
+{
+    <nav class="dashboard-pagination rpt-pagination" aria-label="Páginas de resultados">
+        @if (Model.PaginaActual > 1)
+        {
+            <a asp-controller="Reportes" asp-action="@accion" asp-all-route-data="@Rutas(1)" class="dashboard-page-arrow" aria-label="Primera página" title="Primera página">«</a>
+            <a asp-controller="Reportes" asp-action="@accion" asp-all-route-data="@Rutas(Model.PaginaActual - 1)" class="dashboard-page-arrow" aria-label="Página anterior" title="Página anterior">‹</a>
+        }
+        @for (int pagina = inicio; pagina <= fin; pagina++)
+        {
+            if (pagina == Model.PaginaActual)
+            {
+                <span aria-current="page" class="dashboard-page-number active">@pagina</span>
+            }
+            else
+            {
+                <a asp-controller="Reportes" asp-action="@accion" asp-all-route-data="@Rutas(pagina)" class="dashboard-page-number" aria-label="Página @pagina">@pagina</a>
+            }
+        }
+        @if (Model.PaginaActual < Model.TotalPaginas)
+        {
+            <a asp-controller="Reportes" asp-action="@accion" asp-all-route-data="@Rutas(Model.PaginaActual + 1)" class="dashboard-page-arrow" aria-label="Página siguiente" title="Página siguiente">›</a>
+            <a asp-controller="Reportes" asp-action="@accion" asp-all-route-data="@Rutas(Model.TotalPaginas)" class="dashboard-page-arrow" aria-label="Última página" title="Última página">»</a>
+        }
+    </nav>
+    <div class="rpt-page-info">Página <strong>@Model.PaginaActual</strong> de <strong>@Model.TotalPaginas</strong></div>
+}
