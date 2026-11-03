@@ -58,10 +58,6 @@ namespace InventarioEscuela.Data
                 .HasIndex(u => u.Correo)
                 .IsUnique();
 
-            //Esta es uan prueba
-
-
-
         }
     }
 }
