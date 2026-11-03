@@ -1,0 +1,510 @@
+﻿/* Escala común. Se carga después de site.css y de los estilos de cada módulo. */
+:root {
+    --ui-texto: 12px;
+    --ui-titulo: 20px;
+    --ui-subtitulo: 14px;
+    --ui-control: 32px;
+    --ui-cabecera: 60px;
+    --ui-espacio: 12px;
+    --control-height: var(--ui-control);
+    --compact-height: var(--ui-control);
+}
+
+.sistema-layout, .acceso-layout {
+    font-family: var(--font-family);
+    font-size: var(--ui-texto);
+    line-height: 1.4;
+}
+
+    .sistema-layout .contenido-principal {
+        padding: 8px 12px;
+    }
+
+    .sistema-layout :is(.dashboard-page, .reportes-page, .rpt-page) {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        font-size: var(--ui-texto);
+        line-height: 1.4;
+    }
+
+    .sistema-layout .contenido-principal :is(h1, h2), .acceso-layout h1, .acceso-layout h2 {
+        font-size: var(--ui-titulo);
+        line-height: 1.2;
+    }
+
+    .sistema-layout .contenido-principal h3, .acceso-layout h3 {
+        font-size: var(--ui-subtitulo);
+        line-height: 1.3;
+    }
+
+    /* Tarjetas y filtros de los cuatro módulos operativos. */
+    .sistema-layout .dashboard-section-title {
+        margin: 4px 0 6px;
+    }
+
+    .sistema-layout .dashboard-resumen {
+        margin-bottom: 6px;
+    }
+
+    .sistema-layout .dashboard-card {
+        min-height: 48px;
+        padding: 6px 8px;
+    }
+
+    .sistema-layout .dashboard-card-title {
+        white-space: normal;
+    }
+
+    .sistema-layout .dashboard-card-number {
+        font-size: 16px;
+        overflow-wrap: anywhere;
+    }
+
+    .sistema-layout .filtros-container {
+        margin-bottom: 6px;
+        padding: 6px 8px;
+    }
+
+    .sistema-layout .filtros-titulo {
+        margin-bottom: 4px;
+        font-size: var(--ui-texto);
+    }
+
+    .sistema-layout .filtros {
+        flex-wrap: wrap;
+    }
+
+        .sistema-layout .filtros > * {
+            flex-shrink: 0;
+        }
+
+/* Formularios, catálogos y botones. */
+:is(.sistema-layout, .acceso-layout) :is(.registro-activo-container, .catalogo-dialogo) {
+    padding: 14px;
+}
+
+:is(.sistema-layout, .acceso-layout) .titulo-inventario {
+    margin: 0 0 12px;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-seccion {
+    margin-bottom: 16px;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-seccion-titulo {
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-grid, .sistema-layout .rpt-fields {
+    gap: var(--ui-espacio);
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-campo {
+    min-width: 0;
+}
+
+    :is(.sistema-layout, .acceso-layout) .registro-campo label, .sistema-layout .rpt-field label {
+        margin-bottom: 6px;
+        font-size: var(--ui-texto);
+    }
+
+:is(.sistema-layout, .acceso-layout) .registro-usuario-container .usuario-mostrar-claves {
+    font-size: var(--ui-texto);
+}
+
+:is(.sistema-layout, .acceso-layout) :is(.registro-input, .registro-textarea),
+.sistema-layout :is(.filtro-input, .filtro-select), .sistema-layout .rpt-field :is(input, select) {
+    min-width: 0;
+    font-family: inherit;
+    font-size: var(--ui-texto);
+    line-height: 1.4;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-input, .sistema-layout .rpt-field :is(input, select) {
+    height: var(--ui-control);
+    min-height: var(--ui-control);
+    padding: 0 10px;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-textarea {
+    min-height: 80px;
+    padding: 8px 10px;
+}
+
+:is(.sistema-layout, .acceso-layout) :is(.btn-buscar, .btn-limpiar, .btn-accion, .btn-registrar, .dashboard-action, .dashboard-action-register, .reporte-boton, .btn-report),
+.sistema-layout .rpt-page :is(.rpt-button, .rpt-back) {
+    min-height: var(--ui-control);
+    height: auto;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+:is(.sistema-layout, .acceso-layout) .registro-botones {
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+}
+
+.sistema-layout .dashboard-actions {
+    margin-top: 0;
+    gap: 6px;
+}
+
+.sistema-layout .acciones-title {
+    margin: 6px 0;
+}
+
+/* Tablas con la misma tipografía y altura mínima de fila. */
+.sistema-layout .tabla-base :is(th, td) {
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 11px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.sistema-layout .dashboard-table {
+    min-width: 900px;
+}
+
+.sistema-layout .rpt-table {
+    min-width: 1050px;
+}
+
+.sistema-layout .rpt-summary-table {
+    min-width: 760px;
+}
+
+.sistema-layout .rpt-table tbody th[scope="row"] {
+    height: 32px;
+    font-size: 11px;
+}
+
+.sistema-layout :is(.dashboard-pagination, .paginacion) {
+    margin-top: 6px;
+}
+
+/* Reportes conserva sus tarjetas y colores, con las medidas comunes. */
+.sistema-layout :is(.rpt-header, .rpt-annual, .rpt-form, .rpt-filter-summary, .rpt-annual-guide) {
+    margin: 12px 0;
+    padding: 14px;
+}
+
+.sistema-layout .rpt-page h3 {
+    margin: 16px 0 10px;
+}
+
+.sistema-layout .rpt-page :is(.rpt-annual, .rpt-filter-summary) h3 {
+    margin-top: 0;
+}
+
+.sistema-layout .rpt-advanced {
+    margin: 14px 0;
+}
+
+    .sistema-layout .rpt-advanced summary, .sistema-layout .rpt-annual-guide summary {
+        min-height: var(--ui-control);
+        padding: 8px 12px;
+        font-size: var(--ui-texto);
+    }
+
+    .sistema-layout .rpt-advanced .rpt-fields {
+        padding: 12px;
+    }
+
+.sistema-layout .rpt-actions {
+    gap: 8px;
+    margin: 14px 0 8px;
+}
+
+.sistema-layout .rpt-form > .rpt-actions {
+    margin-bottom: 0;
+    padding-top: 12px;
+}
+
+.sistema-layout :is(.rpt-help, .rpt-callout, .rpt-result-count, .rpt-totals dt, .reporte-descripcion, .rpt-annual-guide p, .rpt-annual-guide details) {
+    font-size: var(--ui-texto);
+    line-height: 1.4;
+}
+
+.sistema-layout .rpt-totals {
+    gap: 6px;
+    margin: 12px 0;
+}
+
+    .sistema-layout .rpt-totals div {
+        padding: 8px 10px;
+    }
+
+    .sistema-layout .rpt-totals dd {
+        font-size: 16px;
+    }
+
+.sistema-layout .reporte-card {
+    min-height: 140px;
+    padding: 14px;
+    gap: 12px;
+}
+
+.sistema-layout .reporte-icono {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    font-size: 21px;
+}
+
+/* Identificación del usuario en la cabecera. */
+.sistema-layout .usuario-sistema .bienvenido {
+    position: static;
+}
+
+.sistema-layout .usuario-sistema .user-info {
+    margin-top: 0;
+}
+
+.sistema-layout .usuario-sistema .user-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Acceso, registro inicial y acceso denegado. */
+.acceso-layout .registro-inicial-pagina {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px 12px;
+}
+
+.acceso-layout.pagina-login .login-container {
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
+}
+
+.acceso-layout.pagina-login :is(.left-panel, .right-panel) {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.acceso-layout.pagina-login .school-name {
+    color: white;
+    font-size: var(--ui-titulo);
+}
+
+.acceso-layout.pagina-login .school-subtitle {
+    font-size: var(--ui-texto);
+}
+
+.acceso-layout.pagina-login .login-title {
+    font-size: var(--ui-titulo);
+}
+
+.acceso-layout.pagina-login .login-box {
+    max-width: 100%;
+    margin: 0;
+    padding: 24px;
+}
+
+.acceso-layout.pagina-login .input-row label {
+    width: 100px;
+    margin-right: 12px;
+    font-size: var(--ui-texto);
+}
+
+.acceso-layout.pagina-login .input-row input {
+    min-width: 0;
+    height: var(--ui-control);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-small);
+    font-family: inherit;
+    font-size: var(--ui-texto);
+}
+
+.acceso-layout.pagina-login .login-button {
+    height: var(--ui-control);
+    border-radius: var(--radius-small);
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.acceso-layout.pagina-login :is(.register-link, .error-message) {
+    font-size: var(--ui-texto);
+}
+
+.acceso-layout.pagina-acceso-denegado, .acceso-layout.pagina-acceso-denegado * {
+    box-sizing: border-box;
+}
+
+    .acceso-layout.pagina-acceso-denegado main {
+        width: min(460px, calc(100% - 24px));
+        margin: 12px;
+        padding: 20px;
+    }
+
+/* El mismo marco para todas las páginas autenticadas de escritorio. */
+@media (min-width: 1101px) {
+    .sistema-layout .sistema-container {
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    .sistema-layout :is(.contenido-sistema, .menu-lateral) {
+        height: 100%;
+        min-height: 0;
+    }
+
+    .sistema-layout .menu-lateral {
+        padding-bottom: 0;
+    }
+
+    .sistema-layout :is(.barra-superior, .logo-escuela) {
+        height: var(--ui-cabecera);
+        min-height: var(--ui-cabecera);
+        flex-shrink: 0;
+    }
+
+    .sistema-layout .opciones-menu {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        gap: 4px;
+    }
+
+    .sistema-layout .opcion-menu {
+        flex-shrink: 0;
+    }
+
+    .sistema-layout .perfil-sidebar-container {
+        position: static;
+        flex-shrink: 0;
+        margin-top: auto;
+    }
+
+    .sistema-layout .contenido-principal {
+        min-height: 0;
+        overflow: auto;
+    }
+
+    .sistema-layout .pie-pagina {
+        flex-shrink: 0;
+    }
+}
+
+@media (min-width: 1101px) and (max-height: 700px) {
+    :root {
+        --ui-cabecera: 54px;
+        --ui-titulo: 18px;
+    }
+
+    .sistema-layout .dashboard-card {
+        min-height: 44px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    .sistema-layout :is(.dashboard-page-number, .dashboard-page-arrow) {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+/* Pantallas pequeñas: flujo natural y controles cómodos para tocar. */
+@media (max-width: 760px) {
+    :root {
+        --ui-control: 44px;
+    }
+
+    .sistema-layout .barra-superior {
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .sistema-layout .titulo-sistema {
+        min-width: 0;
+        padding: 0;
+    }
+
+        .sistema-layout .titulo-sistema h1 {
+            overflow-wrap: anywhere;
+        }
+
+    .sistema-layout .usuario-sistema {
+        width: auto;
+        height: auto;
+        min-width: 0;
+        margin: 0;
+        padding: 8px 0 0;
+        align-items: flex-start;
+        border-left: 0;
+        border-top: 1px solid var(--color-border-soft);
+    }
+
+        .sistema-layout .usuario-sistema .user-info {
+            margin-top: 3px;
+            text-align: left;
+        }
+
+        .sistema-layout .usuario-sistema .user-name {
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .sistema-layout .usuario-sistema .cerrar-sesion-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--ui-control);
+            font-size: 11px;
+        }
+
+    :is(.sistema-layout, .acceso-layout) .registro-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .acceso-layout.pagina-login .login-container {
+        flex-direction: column;
+    }
+
+    .acceso-layout.pagina-login :is(.left-panel, .right-panel) {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .acceso-layout.pagina-login .left-panel {
+        padding: 20px 12px;
+        border-right: 0;
+        border-bottom: 2px solid var(--color-primary-dark);
+    }
+
+    .acceso-layout.pagina-login .right-panel {
+        flex: 1;
+        padding: 16px 12px;
+    }
+
+    .acceso-layout.pagina-login .input-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .acceso-layout.pagina-login .input-row label {
+            width: auto;
+            margin-right: 0;
+            text-align: left;
+        }
+
+        .acceso-layout.pagina-login .input-row input {
+            width: 100%;
+            max-width: none;
+        }
+}

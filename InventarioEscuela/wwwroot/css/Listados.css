@@ -1,4 +1,4 @@
-﻿/* Inicio e Inventario: conservar los controles visibles al 100 % de zoom. */
+﻿/* Distribución de Inicio e Inventario. La escala común está en Sistema.css. */
 .listado-layout .dashboard-table {
     min-width: 900px;
 }
@@ -13,129 +13,21 @@
 }
 
 @media (min-width: 1101px) {
-    .listado-layout .sistema-container {
-        height: 100vh;
-        height: 100dvh;
-        min-height: 0;
-    }
-
-    .listado-layout .contenido-sistema,
-    .listado-layout .menu-lateral {
-        height: 100%;
-        min-height: 0;
-    }
-
-    .listado-layout .menu-lateral {
-        padding-bottom: 0;
-    }
-
-    .listado-layout .barra-superior,
-    .listado-layout .logo-escuela {
-        height: 60px;
-        min-height: 60px;
-        flex-shrink: 0;
-    }
-
-    .listado-layout .usuario-sistema .bienvenido {
-        position: static;
-    }
-
-    .listado-layout .usuario-sistema .user-info {
-        margin-top: 0;
-    }
-
-    .listado-layout .usuario-sistema .user-name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .listado-layout .opciones-menu {
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
-        gap: 4px;
-    }
-
-    .listado-layout .opcion-menu {
-        flex-shrink: 0;
-    }
-
-    .listado-layout .perfil-sidebar-container {
-        position: static;
-        flex-shrink: 0;
-        margin-top: auto;
-    }
-
-    .listado-layout .contenido-principal {
-        min-height: 0;
-        padding: 8px 12px;
-        overflow: auto;
-    }
-
-    .listado-layout .pie-pagina {
-        flex-shrink: 0;
-    }
-
     .listado-layout .dashboard-page {
         display: flex;
         flex-direction: column;
         height: 100%;
         min-height: 0;
-        padding: 0;
     }
 
         .listado-layout .dashboard-page > :not(.dashboard-table-container) {
             flex-shrink: 0;
         }
 
-    .listado-layout .dashboard-section-title {
-        margin: 4px 0 6px;
-    }
-
-    .listado-layout .dashboard-resumen {
-        margin-bottom: 6px;
-    }
-
-    .listado-layout .dashboard-card {
-        min-height: 48px;
-        padding: 6px 8px;
-    }
-
-    .listado-layout .dashboard-card-title {
-        white-space: normal;
-    }
-
-    .listado-layout .filtros-container {
-        margin-bottom: 6px;
-        padding: 6px 8px;
-    }
-
-    .listado-layout .filtros-titulo {
-        margin-bottom: 4px;
-    }
-
-    .listado-layout .filtros {
-        flex-wrap: wrap;
-    }
-
-        .listado-layout .filtros > * {
-            flex-shrink: 0;
-        }
-
-    /* La tabla cede espacio cuando la ventana es baja o los textos son largos. */
     .listado-layout .dashboard-table-container {
-        flex: 1;
-        min-height: 96px;
+        flex: 0 1 auto;
+        min-height: 64px;
         overflow: auto;
-    }
-
-    .listado-layout .dashboard-table th,
-    .listado-layout .dashboard-table td {
-        height: 32px;
-        padding: 4px 8px;
-        font-size: 11px;
-        overflow-wrap: anywhere;
     }
 
     .listado-layout .dashboard-table th {
@@ -143,52 +35,5 @@
         top: 0;
         z-index: 1;
         box-shadow: 0 1px 0 var(--color-border);
-    }
-
-    .listado-layout .dashboard-pagination {
-        margin-top: 6px;
-    }
-
-    .listado-layout .acciones-title {
-        margin: 6px 0;
-    }
-
-    .listado-layout .dashboard-actions {
-        margin-top: 0;
-        gap: 6px;
-    }
-
-    .listado-layout .dashboard-action,
-    .listado-layout .dashboard-action-register {
-        min-height: 32px;
-        padding: 6px 12px;
-    }
-}
-
-@media (min-width: 1101px) and (max-height: 700px) {
-    .listado-layout .barra-superior,
-    .listado-layout .logo-escuela {
-        height: 54px;
-        min-height: 54px;
-    }
-
-    .listado-layout .dashboard-section-title {
-        font-size: 18px;
-    }
-
-    .listado-layout .dashboard-card {
-        min-height: 44px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
-
-    .listado-layout .dashboard-table-container {
-        min-height: 64px;
-    }
-
-    .listado-layout .dashboard-page-number,
-    .listado-layout .dashboard-page-arrow {
-        width: 26px;
-        height: 26px;
     }
 }

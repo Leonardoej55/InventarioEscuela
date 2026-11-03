@@ -45,9 +45,13 @@
               href="~/css/Listados.css"
               asp-append-version="true" />
     }
+
+    <link rel="stylesheet"
+          href="~/css/Sistema.css"
+          asp-append-version="true" />
 </head>
 
-<body class="@(esReportes ? "reportes-layout" : esListado ? "listado-layout" : null)">
+<body class="sistema-layout @(esReportes ? "reportes-layout" : esListado ? "listado-layout" : null)">
     <div class="sistema-container">
         <aside class="menu-lateral">
             <div class="logo-escuela">

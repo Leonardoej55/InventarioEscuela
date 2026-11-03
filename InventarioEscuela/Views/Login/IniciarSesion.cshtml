@@ -5,30 +5,24 @@
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-
-    <title>
-        Inicio de sesión - InventarioEscuela
-    </title>
+    <title>Inicio de sesión - InventarioEscuela</title>
 
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/css/Sistema.css"
+          asp-append-version="true" />
 </head>
 
-<body class="pagina-login">
-
+<body class="acceso-layout pagina-login">
     <div class="login-container">
-
-        <!-- PANEL IZQUIERDO -->
-
         <div class="left-panel">
-
             <div class="school-name">
                 Escuela Proyecto<br />
                 Pacuare
@@ -37,33 +31,22 @@
             <div class="school-subtitle">
                 Gestión de inventario
             </div>
-
         </div>
 
-        <!-- PANEL DERECHO -->
-
         <div class="right-panel">
-
             <div class="login-box">
+                <h1 class="login-title">Inicio de sesión</h1>
 
-                <h1 class="login-title">
-                    Inicio de sesión
-                </h1>
-
-                @if (TempData["PrimerAdministradorCreado"]
-                    is string mensajeExito)
+                @if (TempData["PrimerAdministradorCreado"] is string mensajeExito)
                 {
-                    <div class="usuario-exito"
-                         role="status">
+                    <div class="usuario-exito" role="status">
                         @mensajeExito
                     </div>
                 }
 
-                @if (TempData["ErrorPrimerAdministrador"]
-                    is string mensajeError)
+                @if (TempData["ErrorPrimerAdministrador"] is string mensajeError)
                 {
-                    <div class="error-message"
-                         role="alert">
+                    <div class="error-message" role="alert">
                         @mensajeError
                     </div>
                 }
@@ -73,57 +56,42 @@
                       method="post">
 
                     <div class="input-row">
-
-                        <label for="correo">
-                            Usuario:
-                        </label>
+                        <label for="correo">Usuario:</label>
 
                         <input type="text"
                                id="correo"
                                name="correo"
                                autocomplete="username"
                                required />
-
                     </div>
 
                     <div class="input-row">
-
-                        <label for="clave">
-                            Contraseña:
-                        </label>
+                        <label for="clave">Contraseña:</label>
 
                         <input type="password"
                                id="clave"
                                name="clave"
                                autocomplete="current-password"
                                required />
-
                     </div>
 
                     <div class="button-container">
-
-                        <button type="submit"
-                                class="login-button">
+                        <button type="submit" class="login-button">
                             Log In
                         </button>
-
                     </div>
 
                     @if (ViewData["Mensaje"] != null)
                     {
-                        <div class="error-message"
-                             role="alert">
+                        <div class="error-message" role="alert">
                             @ViewData["Mensaje"]
                         </div>
                     }
-
                 </form>
 
-                @if (ViewData["PuedeCrearPrimerAdministrador"]
-                    is true)
+                @if (ViewData["PuedeCrearPrimerAdministrador"] is true)
                 {
                     <div class="registro-inicial-acciones">
-
                         <p>
                             Aún no hay usuarios registrados.
                             Cree la primera cuenta de administrador.
@@ -134,7 +102,6 @@
                            class="btn-registrar">
                             Crear primer administrador
                         </a>
-
                     </div>
                 }
                 else
@@ -144,13 +111,8 @@
                         contacta al administrador.
                     </div>
                 }
-
             </div>
-
         </div>
-
     </div>
-
 </body>
-
 </html>
